@@ -1,0 +1,20 @@
+﻿Category,Code,Description
+Main Climate,A,Equatorial
+Main Climate,B,Arid
+Main Climate,C,Warm Temperate
+Main Climate,D,Snow
+Main Climate,E,Polar
+Precipitation,W,Desert
+Precipitation,S,Steppe
+Precipitation,f,Fully Humid
+Precipitation,s,Summer Dry
+Precipitation,w,Winter Dry
+Precipitation,m,Monsoonal
+Temperature,a,Hot Summer
+Temperature,b,Warm Summer
+Temperature,c,Cool Summer
+Temperature,d,Extremely Continental
+Temperature,h,Hot Arid
+Temperature,k,Cold Arid
+Temperature,F,Polar Frost
+Temperature,T,Polar Tundra
