@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def read_excel_file(file_path, sheet_name, header, index_col, usecols, skiprows, na_filter):
+def read_excel_file(file_path, sheet_name, header, index_col, usecols, skiprows, na_filter, skipfooter):
     """Reads an Excel file and returns the DataFrame."""
     try:
         df = pd.read_excel(
@@ -11,7 +11,8 @@ def read_excel_file(file_path, sheet_name, header, index_col, usecols, skiprows,
             index_col=index_col,		# Column (0-indexed) to use as the row labels of the DataFrame
             usecols=usecols,			# Column letters or Column Ranges to be parsed
             skiprows=skiprows,			# Line numbers to skip (0-indexed) or number of lines to skip (int) at the start of the file
-            na_filter=na_filter			# Detect missing value markers, passing na_filter=False can improve the performance of reading a large file
+            na_filter=na_filter,		# Detect missing value markers, passing na_filter=False can improve the performance of reading a large file
+            skipfooter=skipfooter,      # Rows at the end to skip (0-indexed)
             )
         return df
     except FileNotFoundError:
