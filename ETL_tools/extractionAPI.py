@@ -16,7 +16,7 @@ def extractClimateData():
 	GEIPath = climatePath + '1.2_Global_Environmental_Indicators/'
 
 	GEI_AC_1 = read_csv_file(GEIPath + 'Air and Climate/CH4_N2O_Emissions.csv', 0, None, None)
-	GEI_AC_2 = read_excel_file(GEIPath + 'Air and Climate/CO2_Emissions.xlsx', None, 16, None, "B,C,E,G,I", 0, False, 0)
+	GEI_AC_2 = read_excel_file(GEIPath + 'Air and Climate/CO2_Emissions.xlsx', 0, 16, None, "B,C,E,G,I", 0, False, 0)
 	GEI_AC_3 = read_excel_file(GEIPath + 'Air and Climate/GHG_by_Sector_Perc.xlsx', None, 29, None, "B:I", 0, False, 0)
 	GEI_AC_4 = read_excel_file(GEIPath + 'Air and Climate/GHG_Emissions_by_Sector.xlsx', None, 16, None, "B:I", 0, False, 0)
 	GEI_AC_5 = read_excel_file(GEIPath + 'Air and Climate/GHG_Emissions.xlsx', None, 16, None, "B,C,D,F,H,J", 0, False, 0)
