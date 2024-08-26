@@ -33,3 +33,15 @@ def read_csv_file(file_path, header, index_col, usecols):
     except FileNotFoundError:
         print(f"File not found: {file_path}")
         return None
+    
+
+def getNumericalData(df):
+    
+    numericalDf = df.iloc[1:, 1:] 											    # Dataframe with numerical rows and columns
+
+    non_numericalRows = df.iloc[:1, :]										    # Dataframe with rows excluded
+    non_numericalColumns = df.iloc[1:, :1]	                                    # Dataframe with columns excluded
+
+    #print(non_numericalRows, "\n", non_numericalColumns)
+
+    return numericalDf, non_numericalRows, non_numericalColumns

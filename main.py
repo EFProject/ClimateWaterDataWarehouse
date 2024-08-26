@@ -4,12 +4,22 @@
 from ETL_tools.extractionAPI import *
 
 climateDF = extractClimateData()
-print(climateDF[1][1])
+print("\n Dataframe: \n",climateDF[1][1])
 #print(CID.index, "\n", CID.columns ,"\n", CID.dtypes, "\n", CID.values)
+
+### TRASFORMATION ###
+
+from ETL_tools.transformationAPI import *
+
+dfStandardized = applyStandardizationFormat(climateDF[1][1])
+print("\n Dataframe after StandardizationFormat: \n",dfStandardized)
 
 ### CLEANSING ###
 
 from ETL_tools.cleansingAPI import *
 
-dfCleaned = handleMissingValuesRemoval(climateDF[1][1], 0.8)
-print(dfCleaned)
+dfCleaned = handleMissingValuesRemoval(dfStandardized, 0.8)
+print("\n Dataframe after MissingValuesRemoval : \n",dfCleaned)
+
+dfImputated = handleMissingValuesImputation(dfCleaned)
+print("\n Dataframe after MissingValuesImputation: \n",dfImputated)

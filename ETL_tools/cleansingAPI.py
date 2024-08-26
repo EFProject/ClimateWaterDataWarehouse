@@ -1,15 +1,11 @@
 # Cleansing Phase: improve data qualit, normally quite poor in sources.
 
-import numpy as np
-
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 from utils.pandasAPI import *
 
 
 def handleMissingValuesRemoval(df, threshold):
-
-	df.replace(["...", "…", ""], np.nan, inplace=True)				# Replace all missing values with NaN
 
 	df.dropna(axis=0, how='all', inplace=True)						# Drop the rows where all elements are missing.
 	df.dropna(axis=1, how='all', inplace=True)						# Drop the columns where all elements are missing.
@@ -21,28 +17,23 @@ def handleMissingValuesRemoval(df, threshold):
 	df.dropna(axis=0, thresh=row_threshold, inplace=True)			# Drop rows with threshold% or more missing values
 	df.dropna(axis=1, thresh=col_threshold, inplace=True)			# Drop columns with threshold% or more missing values
 
-	return df
+	return df.reset_index(drop=True)
 
 
 def handleMissingValuesImputation(df):
 
-	# Separate numerical and non-numerical columns
-	numerical_cols = df.select_dtypes(include=[np.number]).columns
-	non_numerical_cols = df.select_dtypes(exclude=[np.number]).columns
+	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df)			# Separate numerical Data from not numerical Data
 
-	df_numerical_cols = df.iloc[:, 1:] #take only the first column (country)
-	df_excluding_first_row = df_numerical_cols.drop(index=0).reset_index(drop=True) #exclude first row (unit of measure)
-	print(df_excluding_first_row)
+	imputer = IterativeImputer(max_iter=10, random_state=0)								# Use IterativeImputer to perform Imputation
+	imputed_array = imputer.fit_transform(numericalDf)
+	imputed_numerical_df = pd.DataFrame(imputed_array, columns=numericalDf.columns)
+	imputed_numerical_df.index = imputed_numerical_df.index + 1 						# Resetting the index to start from the number of excluded rows
 
-	imputer = IterativeImputer(max_iter=10, random_state=0)
-	imputed_array = imputer.fit_transform(df_excluding_first_row)
-	imputed_numerical_df = pd.DataFrame(imputed_array, columns=numerical_cols)
+	#print("\n Numerical data after imputation: \n", imputed_numerical_df)
 
-	final_df = pd.concat([imputed_numerical_df, df[non_numerical_cols]], axis=1) #reassmble new df with the excluded columns before
-
-	print("After Imputation:")
-	print(final_df)
+	dfImputed = pd.concat([non_numericalColumns, imputed_numerical_df], axis=1).reset_index(drop=True)
+	dfImputed = pd.concat([non_numericalRows, dfImputed], axis=0).reset_index(drop=True)
 
 	# df['parameter_value'].fillna(df['parameter_value'].mean(), inplace=True)		# Filling missing values with the column mean
 
-	return df
+	return dfImputed
