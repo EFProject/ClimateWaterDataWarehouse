@@ -37,3 +37,10 @@ def handleMissingValuesImputation(df):
 	# df['parameter_value'].fillna(df['parameter_value'].mean(), inplace=True)		# Filling missing values with the column mean
 
 	return dfImputed
+
+
+def handleDuplicatesRemoval(df):
+
+	df.drop_duplicates(inplace=True) 		# Remove duplicate rows
+
+	return df

@@ -18,8 +18,21 @@ print("\n Dataframe after StandardizationFormat: \n",dfStandardized)
 
 from ETL_tools.cleansingAPI import *
 
-dfCleaned = handleMissingValuesRemoval(dfStandardized, 0.8)
+dfCleaned = handleDuplicatesRemoval(dfStandardized)
+print("\n Dataframe after DuplicatesRemoval : \n",dfCleaned)
+
+dfCleaned = handleMissingValuesRemoval(dfCleaned, 0.8)
 print("\n Dataframe after MissingValuesRemoval : \n",dfCleaned)
 
 dfImputated = handleMissingValuesImputation(dfCleaned)
 print("\n Dataframe after MissingValuesImputation: \n",dfImputated)
+
+### EXPLORATION ###
+
+from utils.explorationAPI import *
+
+#print(getDescriptionStatistics(dfImputated))
+
+#getDataDistribution(dfImputated)
+
+# getDataCorrelation(dfImputated)

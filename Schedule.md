@@ -1,8 +1,8 @@
 # Schedule for Implementing the Project
 
-This schedule breaks down the project into weekly tasks. You will use Python libraries like pandas for data manipulation and SQLAlchemy or psycopg2 for saving data to a PostgreSQL database.
+This schedule breaks down the ClimateWaterDataWarehouse project into project phases.
 
-## Week 1: Project Setup and Data Collection
+## Phase 1: Project Setup and Data Collection
 
 ### Project Setup
 Task: Set up a Python environment with the required libraries.
@@ -25,7 +25,7 @@ Task: Identify and download datasets (climate and water quality datasets).
 
 Tools: Use pandas to read data from .csv or .xlsx files, and requests to download data if needed.
 
-Deliverables: Datasets saved locally in a datasets/ directory.
+Deliverables: Datasets saved locally in a "datasets/" directory.
 
 Example Code:
 
@@ -33,7 +33,7 @@ Example Code:
 	climate_data = pd.read_csv('datasets/climate_data.csv')
 	water_quality_data = pd.read_excel('datasets/waterDataset/metadata.xlsx')
 
-## Week 2: Data Cleaning and Exploration
+## Phase 2: Data Cleaning and Exploration
 
 ### Data Cleaning
 Task: Ensure the datasets are in a consistent, usable format by handling missing values, dealing with outliers, standardizing formats, and normalizing the data.
@@ -193,122 +193,124 @@ Deliverables: Basic visualizations and summary statistics to understand the data
     - A correlation matrix can highlight potential correlations between variables (e.g., higher temperature might correlate with lower humidity).
     - Scatter plots can reveal trends or clusters in the data (e.g., locations with high rainfall may have lower water quality).
 
-## Week 3: Data Integration and Schema Design
+## Phase 3: Data Integration and Schema Design
 
-    Data Integration
-        Task: Integrate climate and water quality data by common keys like location and date.
-        Tools: pandas.merge()
-        Deliverables: Combined dataset with relevant climate and water quality parameters.
-        Example Code:
+### Data Integration
+Task: Integrate climate and water quality data by common keys like location and date.
+    
+Tools: pandas.merge()
+    
+Deliverables: Combined dataset with relevant climate and water quality parameters.
+    
+Example Code:
 
-        python
+    combined_data = pd.merge(climate_data, water_quality_data, on=['location', 'date'], how='inner')
 
-        combined_data = pd.merge(climate_data, water_quality_data, on=['location', 'date'], how='inner')
+### Database Schema Design
+Task: Design a database schema, including fact and dimension tables, for storing the combined data. Use star schema or snowflake schema.
 
-    Database Schema Design
-        Task: Design a database schema, including fact and dimension tables, for storing the combined data. Use star schema or snowflake schema.
-        Tools: Use draw.io or dbdiagram.io for visualizing the schema.
-        Deliverables: A well-structured database schema with fact and dimension tables.
-        Schema Example:
-            Fact Table: climate_water_fact
-            Dimension Tables: climate_dim, water_quality_dim, location_dim, time_dim
+Tools: Use draw.io or dbdiagram.io for visualizing the schema.
 
-Week 4: Database Setup and ETL Operations
+Deliverables: A well-structured database schema with fact and dimension tables.
+        
+Schema Example:
 
-    Database Setup
-        Task: Set up a PostgreSQL database locally or in the cloud (e.g., using AWS RDS).
-        Tools: PostgreSQL, pgAdmin for managing the database, SQLAlchemy or psycopg2 for Python-PostgreSQL interaction.
-        Deliverables: A running PostgreSQL instance with user access set up.
-        Example Command:
+    Fact Table: climate_water_fact
+    Dimension Tables: climate_dim, water_quality_dim, location_dim, time_dim
 
-        bash
+## Phase 4: Database Setup and ETL Operations
+
+### Database Setup
+Task: Set up a PostgreSQL database locally or in the cloud (e.g., using AWS RDS).
+
+Tools: PostgreSQL, pgAdmin for managing the database, SQLAlchemy or psycopg2 for Python-PostgreSQL interaction.
+
+Deliverables: A running PostgreSQL instance with user access set up.
+
+Example Command:
 
     sudo apt-get install postgresql postgresql-contrib
 
-ETL - Extract, Transform, Load
+### ETL - Extract, Transform, Load
+Task: Write ETL scripts to load the cleaned and integrated data into the PostgreSQL database.
 
-    Task: Write ETL scripts to load the cleaned and integrated data into the PostgreSQL database.
-    Tools: pandas, SQLAlchemy or psycopg2
-    Deliverables: Data successfully loaded into the fact and dimension tables in the database.
-    Example Code:
+Tools: pandas, SQLAlchemy or psycopg2
 
-    python
+Deliverables: Data successfully loaded into the fact and dimension tables in the database.
 
-        from sqlalchemy import create_engine
+Example Code:
 
-        engine = create_engine('postgresql://username:password@localhost/dbname')
-        combined_data.to_sql('climate_water_fact', engine, if_exists='replace', index=False)
+    from sqlalchemy import create_engine
 
-Week 5: Data Analysis and Reporting
+    engine = create_engine('postgresql://username:password@localhost/dbname')
+    combined_data.to_sql('climate_water_fact', engine, if_exists='replace', index=False)
 
-    Data Analysis
-        Task: Perform data analysis using SQL queries and pandas. Generate insights from the data using OLAP operations (e.g., aggregations, filtering).
-        Tools: SQL for querying the database, pandas for further data manipulation.
-        Deliverables: Insights and key statistics derived from the database.
-        Example SQL Query:
+## Phase 5: Data Analysis and Reporting
 
-        sql
+### Data Analysis
+Task: Perform data analysis using SQL queries and pandas. Generate insights from the data using OLAP operations (e.g., aggregations, filtering).
+
+Tools: SQL for querying the database, pandas for further data manipulation.
+
+Deliverables: Insights and key statistics derived from the database.
+
+Example SQL Query:
 
     SELECT climate_zone, AVG(measurement_value)
     FROM climate_water_fact
     GROUP BY climate_zone;
 
-Reporting
+### Reporting
+Task: Create visualizations and reports based on the analysis.
 
-    Task: Create visualizations and reports based on the analysis.
-    Tools: matplotlib, seaborn, Jupyter Notebook
-    Deliverables: Charts and reports showing the insights from the data analysis.
-    Example Code:
+Tools: matplotlib, seaborn, Jupyter Notebook
 
-    python
+Deliverables: Charts and reports showing the insights from the data analysis.
 
-        import seaborn as sns
+Example Code:
 
-        sns.barplot(x='climate_zone', y='measurement_value', data=combined_data)
+    import seaborn as sns
 
-Week 6: Final Testing, Documentation, and Optimization
+    sns.barplot(x='climate_zone', y='measurement_value', data=combined_data)
 
-    Testing
-        Task: Test the ETL pipeline and data queries to ensure everything is working as expected.
-        Tools: unittest or pytest for writing test cases.
-        Deliverables: A fully tested project with all bugs identified and fixed.
-        Example Test:
+## Phase 6: Final Testing, Documentation, and Optimization
 
-        python
+### Testing
+Task: Test the ETL pipeline and data queries to ensure everything is working as expected.
 
-        def test_no_null_values():
-            assert combined_data.notnull().all().all()
+Tools: unittest or pytest for writing test cases.
 
-    Documentation
-        Task: Write comprehensive documentation for the project, including setup instructions, code comments, and explanations of the ETL process.
-        Tools: Markdown, Jupyter Notebooks
-        Deliverables: Clear and concise documentation.
+Deliverables: A fully tested project with all bugs identified and fixed.
 
-    Optimization
-        Task: Optimize the database schema and queries for performance, especially for large datasets.
-        Tools: Indexing in PostgreSQL, query optimization techniques.
-        Deliverables: Optimized queries and database performance improvements.
+Example Test:
 
-Week 7: Project Presentation and Submission
+    def test_no_null_values():
+    assert combined_data.notnull().all().all()
 
-    Final Presentation
-        Task: Prepare a presentation that summarizes the project, including the ETL process, schema design, analysis, and findings.
-        Deliverables: A well-prepared presentation.
-        Tools: PowerPoint or Jupyter Notebooks for live demos.
+### Documentation
+Task: Write comprehensive documentation for the project, including setup instructions, code comments, and explanations of the ETL process.
 
-    Project Submission
-        Task: Submit the final project with all the necessary files, code, data, and documentation.
-        Deliverables: Complete project submission as per the guidelines.
+Tools: Markdown, Jupyter Notebooks
 
-Summary of Tools and Libraries:
+Deliverables: Clear and concise documentation.
 
-    Data Handling: pandas, numpy
-    Database Interaction: SQLAlchemy, psycopg2
-    Visualization: matplotlib, seaborn
-    Environment Setup: venv, conda
-    Documentation: Markdown, Jupyter Notebooks
-    Database: PostgreSQL
+### Optimization
+Task: Optimize the database schema and queries for performance, especially for large datasets.
 
-Final Thoughts:
+Tools: Indexing in PostgreSQL, query optimization techniques.
 
-By following this schedule, you'll ensure a structured and well-implemented project using Python and PostgreSQL. Each week builds upon the previous tasks, gradually taking you from data collection to the final analysis and reporting stages.
+Deliverables: Optimized queries and database performance improvements.
+
+## Phase 7: Project Presentation and Submission
+
+### Final Presentation
+Task: Prepare a presentation that summarizes the project, including the ETL process, schema design, analysis, and findings.
+
+Deliverables: A well-prepared presentation.
+
+Tools: PowerPoint or Jupyter Notebooks for live demos.
+
+### Project Submission
+Task: Submit the final project with all the necessary files, code, data, and documentation.
+
+Deliverables: Complete project submission as per the guidelines.

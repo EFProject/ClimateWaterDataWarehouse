@@ -5,25 +5,39 @@ import numpy as np
 from utils.pandasAPI import *
 
 
-def standardize_format(val):
+def standardize_numerical_format(value):
 
-	val = val.replace(' ', '')			# Remove spaces
+	if(not isinstance(value, (int, float))): 
+		value = value.strip()
+		value = value.replace(' ', '')
+		value = value.replace(',', '.')
 
-	val = val.replace(',', '.')			# Replace comma with dot for consistent decimal separator
+	try:
+		return pd.to_numeric(value, errors='coerce')  # Convert to numeric, errors='coerce' will convert invalid parsing to NaN
+	except ValueError:
+		return np.nan
+	
+def standardize_string_format(value):
 
-	return val
+	value = value.strip()
+	#value = value.replace(' ', '_')
+	value = value.replace(',', '.')
+
+	return value
 
 
 def applyStandardizationFormat(df):
 
-	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df)			# Separate numerical Data from not numerical Data
+	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df)				# Separate numerical Data from not numerical Data
 
-	numericalDf = numericalDf.apply(standardize_format)									# Apply the standardization function
-	numericalDfFormatted = numericalDf.apply(pd.to_numeric, errors='coerce')			# Convert to numeric, errors='coerce' will convert invalid parsing to NaN
+	numericalDf = numericalDf.applymap(standardize_numerical_format)						# Apply the standardization function
 
-	dfFormatted = pd.concat([non_numericalColumns, numericalDfFormatted], axis=1).reset_index(drop=True)
+	non_numericalRows = non_numericalRows.applymap(standardize_string_format)	
+	non_numericalColumns = non_numericalColumns.applymap(standardize_string_format)	
+	
+	dfFormatted = pd.concat([non_numericalColumns, numericalDf], axis=1).reset_index(drop=True)
 	dfFormatted = pd.concat([non_numericalRows, dfFormatted], axis=0).reset_index(drop=True)
 
-	dfFormatted.replace(["...", "…", ""], np.nan, inplace=True)							# Replace all missing values with NaN
+	dfFormatted.replace(["...", "…", ""], np.nan, inplace=True)								# Replace all missing values with NaN
 
 	return dfFormatted
