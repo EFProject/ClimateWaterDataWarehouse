@@ -1,3 +1,4 @@
+import sys
 
 ### EXTRACTION ###
 
@@ -36,3 +37,15 @@ from utils.explorationAPI import *
 #getDataDistribution(dfImputated)
 
 # getDataCorrelation(dfImputated)
+
+### LOADING ###
+
+from utils.dbConnectionHandler import connection_handler
+from ETL_tools.loadingAPI import *
+
+dbConnection = connection_handler()
+if (dbConnection == None): sys.exit() 
+
+createSchema(dbConnection)
+
+loadDataFrame(dfImputated, dbConnection, 'example_table')
