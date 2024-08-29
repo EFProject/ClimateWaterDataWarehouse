@@ -38,14 +38,20 @@ from utils.explorationAPI import *
 
 # getDataCorrelation(dfImputated)
 
-### LOADING ###
+### SETUP DB ###
 
 from utils.dbConnectionHandler import connection_handler
-from ETL_tools.loadingAPI import *
+from utils.dbSetUpHandler import *
 
 dbConnection = connection_handler()
 if (dbConnection == None): sys.exit() 
 
-createSchema(dbConnection)
+setUpDB(dbConnection)
 
-loadDataFrame(dfImputated, dbConnection, 'example_table')
+lookupTables = getLookupTable(dbConnection)
+
+### LOADING ###
+
+from ETL_tools.loadingAPI import *
+
+loadDataFrame(dfImputated, dbConnection, lookupTables)

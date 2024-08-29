@@ -30,10 +30,10 @@ def applyStandardizationFormat(df):
 
 	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df)				# Separate numerical Data from not numerical Data
 
-	numericalDf = numericalDf.applymap(standardize_numerical_format)						# Apply the standardization function
+	numericalDf = numericalDf.map(standardize_numerical_format)						# Apply the standardization function
 
-	non_numericalRows = non_numericalRows.applymap(standardize_string_format)	
-	non_numericalColumns = non_numericalColumns.applymap(standardize_string_format)	
+	non_numericalRows = non_numericalRows.map(standardize_string_format)	
+	non_numericalColumns = non_numericalColumns.map(standardize_string_format)	
 	
 	dfFormatted = pd.concat([non_numericalColumns, numericalDf], axis=1).reset_index(drop=True)
 	dfFormatted = pd.concat([non_numericalRows, dfFormatted], axis=0).reset_index(drop=True)
