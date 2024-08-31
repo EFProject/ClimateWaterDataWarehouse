@@ -5,14 +5,13 @@ import sys
 from ETL_tools.extractionAPI import *
 
 climateDF = extractClimateData()
-print("\n Dataframe: \n",climateDF[1][1])
-#print(CID.index, "\n", CID.columns ,"\n", CID.dtypes, "\n", CID.values)
+print("\n Dataframe: \n",climateDF[1][2])
 
 ### TRASFORMATION ###
 
 from ETL_tools.transformationAPI import *
 
-dfStandardized = applyStandardizationFormat(climateDF[1][1])
+dfStandardized = applyStandardizationFormat(climateDF[1][2])
 print("\n Dataframe after StandardizationFormat: \n",dfStandardized)
 
 ### CLEANSING ###

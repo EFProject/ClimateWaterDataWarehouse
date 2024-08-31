@@ -36,11 +36,16 @@ def read_csv_file(file_path, header, index_col, usecols):
     
 
 def getNumericalData(df):
-    
-    numericalDf = df.iloc[1:, 1:] 											    # Dataframe with numerical rows and columns
 
-    non_numericalRows = df.iloc[:1, :]										    # Dataframe with rows excluded
-    non_numericalColumns = df.iloc[1:, :1]	                                    # Dataframe with columns excluded
+    non_numericalColumnsCounter = 0
+    
+    if 'Country' in df.columns : non_numericalColumnsCounter += 1
+    if 'latest year available' in df.columns : non_numericalColumnsCounter += 1
+    
+    numericalDf = df.iloc[1:, non_numericalColumnsCounter:] 		                # Dataframe with numerical rows and columns
+
+    non_numericalRows = df.iloc[:1, :]										        # Dataframe with rows excluded
+    non_numericalColumns = df.iloc[1:, :non_numericalColumnsCounter]	            # Dataframe with columns excluded
 
     #print(non_numericalRows, "\n", non_numericalColumns)
 

@@ -7,6 +7,31 @@ def loadDataFrame(df, connection, lookupTables):
 
     try:
 
+        ### Date_Dim handler
+
+        if 'latest year available' in non_numericalColumns.columns and not non_numericalColumns['latest year available'].empty:
+            for year in non_numericalColumns['latest year available']:
+                month = '01'
+                quarter = 'Q1'
+                date = f'{year}-{month}-01'
+                if not date in lookupTables[2] :
+                    insert_date = text('''
+                                        INSERT INTO "Date_Dim" (date, month, quarter, year) 
+                                        VALUES (:date, :month, :quarter, :year)
+                                        RETURNING date_id;
+                                        ''')
+                    new_insert = connection.execute(insert_date, {
+                        'date': date,
+                        'month': month,
+                        'quarter': quarter,
+                        'year': year
+                    })
+                    date_id = new_insert.fetchone()[0]
+                    lookupTables[2][date] = date_id
+            print("The 'Date_Dim' table correctly populated")
+        else:
+            print("The 'latest year available' column is either missing or empty in the DataFrame.")
+
         ### Location_Dim handler
 
         if 'Country' in non_numericalColumns.columns and not non_numericalColumns['Country'].empty:
@@ -48,14 +73,42 @@ def loadDataFrame(df, connection, lookupTables):
 
 
         print("\n LookupTables status:")
-        print("Location_Dim : ", len(lookupTables[0]), " rows, ","Param_Dim : ", len(lookupTables[1]), " rows \n")
+        print("Date_Dim : ", len(lookupTables[2]), "Location_Dim : ", len(lookupTables[0]), " rows, ","Param_Dim : ", len(lookupTables[1]), " rows \n")
+
+        print(non_numericalColumns.columns,len(non_numericalColumns.columns))
 
 
         ### Environment_Fact handler
 
+        for index, row in df.iloc[1:].iterrows():
+            location_id = lookupTables[0].get(row['Country'])
+            if location_id is None:
+                print(f"Location of '{row['Country']}' not found in location_dim.")
+                #continue    # Skip this row if location_id is not found
+            
+            for column in df.columns[len(non_numericalColumns.columns):]:
+                param_id = lookupTables[1].get(column)
+                if param_id is None:
+                    print(f"Parameter '{column}' not found in param_dim.")
+                    #continue  # Skip this column if param_id is not found
+                
+                measurement_value = round(row[column], 3) # Round to 3 decimal places
+                
+                insert_mv = text('''
+                    INSERT INTO "Environment_Fact" (location_id, param_id, measurement_value)
+                    VALUES (:location_id, :param_id, :measurement_value)
+                    ON CONFLICT DO NOTHING;
+                ''')
+                
+                connection.execute(insert_mv, {
+                    'location_id': location_id,
+                    'param_id': param_id,
+                    'measurement_value': measurement_value
+                })
 
-
-
+        result = connection.execute(text('SELECT COUNT(*) FROM "Environment_Fact";'))
+        count = result.scalar()
+        print(f"The 'Environment_Fact' table correctly populated : {count} rows \n ")
         
 
         #numericalDf.to_sql("Location_Dim", connection, schema='ClimateWaterDataWarehouse', if_exists='replace', index=False)
