@@ -1,4 +1,4 @@
 *__pycache__
 utils/__pycache__/pandasAPI.cpython-311.pyc
 
-*.json
+postgres_credentials.json

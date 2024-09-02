@@ -10,7 +10,7 @@ def setUpDB(connection):
 	# Set the search path to use the ClimateWaterDataWarehouse schema as default
 	connection.execute(text('SET search_path TO "ClimateWaterDataWarehouse";'))              
 	tables = connection.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema = 'ClimateWaterDataWarehouse';")).fetchall()
-	if len(tables) != 4:
+	if len(tables) != 5:
 		#SetUp Tables
 		connection.execute(text('''
 								CREATE TABLE IF NOT EXISTS "Date_Dim" (
@@ -42,11 +42,21 @@ def setUpDB(connection):
 								);
 								'''))
 		connection.execute(text('''
+								CREATE TABLE IF NOT EXISTS "Source_Dim" (
+									source_id SERIAL PRIMARY KEY,
+									source_name VARCHAR(255) UNIQUE NOT NULL,
+									source_type VARCHAR(255),
+									description VARCHAR(255)
+								);
+								'''))
+		connection.execute(text('''
 								CREATE TABLE IF NOT EXISTS "Environment_Fact" (
+						  			date_id INT REFERENCES "ClimateWaterDataWarehouse"."Date_Dim"(date_id),
 									location_id INT REFERENCES "ClimateWaterDataWarehouse"."Location_Dim"(location_id),
 									param_id INT REFERENCES "ClimateWaterDataWarehouse"."Param_Dim"(param_id),
+						  			source_id INT REFERENCES "ClimateWaterDataWarehouse"."Source_Dim"(source_id),
 									measurement_value FLOAT(24),
-						  			CONSTRAINT unique_mv UNIQUE (location_id, param_id)
+						  			CONSTRAINT unique_mv UNIQUE (date_id, location_id, param_id, source_id)
 								);
 								'''))
 

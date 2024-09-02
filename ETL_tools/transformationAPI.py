@@ -1,5 +1,6 @@
 # Trasformation Phase: It converts data from its operational source format intoa specific data warehouse format.
 
+import datetime
 import numpy as np
 
 from utils.pandasAPI import *
@@ -13,9 +14,9 @@ def standardize_numerical_format(value):
 		value = value.replace(',', '.')
 
 	try:
-		return pd.to_numeric(value, errors='coerce')  # Convert to numeric, errors='coerce' will convert invalid parsing to NaN
+		return pd.to_numeric(value, errors='coerce')  	# Convert to numeric, errors='coerce' will convert invalid parsing to NaN
 	except ValueError:
-		return np.nan
+		return np.nan									# Replace all missing values with NaN
 	
 def standardize_string_format(value):
 
@@ -23,6 +24,20 @@ def standardize_string_format(value):
 		value = value.strip()
 		#value = value.replace(' ', '_')
 		value = value.replace(',', '.')
+	
+	if value == "..." or  value == "" or value == "…" :
+		return np.nan									# Replace all missing values with NaN
+
+	return value
+
+def standardize_datetime_format(value):
+	
+	if not pd.isna(value) :
+		year = int(value)
+		month = 1
+		#quarter = 'Q1'
+		date = datetime.date(year, month=month, day=1)
+		return date
 
 	return value
 
@@ -35,10 +50,10 @@ def applyStandardizationFormat(df):
 
 	non_numericalRows = non_numericalRows.map(standardize_string_format)	
 	non_numericalColumns = non_numericalColumns.map(standardize_string_format)	
+	if 'latest year available' in non_numericalColumns.columns :
+		non_numericalColumns['latest year available'] = non_numericalColumns['latest year available'].map(standardize_datetime_format)
 	
 	dfFormatted = pd.concat([non_numericalColumns, numericalDf], axis=1).reset_index(drop=True)
 	dfFormatted = pd.concat([non_numericalRows, dfFormatted], axis=0).reset_index(drop=True)
-
-	dfFormatted.replace(["...", "…", ""], np.nan, inplace=True)								# Replace all missing values with NaN
 
 	return dfFormatted

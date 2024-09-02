@@ -1,3 +1,4 @@
+import datetime
 from sqlalchemy import text
 from utils.pandasAPI import *
 
@@ -10,10 +11,7 @@ def loadDataFrame(df, connection, lookupTables):
         ### Date_Dim handler
 
         if 'latest year available' in non_numericalColumns.columns and not non_numericalColumns['latest year available'].empty:
-            for year in non_numericalColumns['latest year available']:
-                month = '01'
-                quarter = 'Q1'
-                date = f'{year}-{month}-01'
+            for date in non_numericalColumns['latest year available']:
                 if not date in lookupTables[2] :
                     insert_date = text('''
                                         INSERT INTO "Date_Dim" (date, month, quarter, year) 
@@ -22,9 +20,9 @@ def loadDataFrame(df, connection, lookupTables):
                                         ''')
                     new_insert = connection.execute(insert_date, {
                         'date': date,
-                        'month': month,
-                        'quarter': quarter,
-                        'year': year
+                        'month': date.month,
+                        'quarter': "Q1",
+                        'year': date.year
                     })
                     date_id = new_insert.fetchone()[0]
                     lookupTables[2][date] = date_id
@@ -75,12 +73,17 @@ def loadDataFrame(df, connection, lookupTables):
         print("\n LookupTables status:")
         print("Date_Dim : ", len(lookupTables[2]), "Location_Dim : ", len(lookupTables[0]), " rows, ","Param_Dim : ", len(lookupTables[1]), " rows \n")
 
-        print(non_numericalColumns.columns,len(non_numericalColumns.columns))
-
 
         ### Environment_Fact handler
 
         for index, row in df.iloc[1:].iterrows():
+            if 'latest year available' in non_numericalColumns.columns :
+                date_id = lookupTables[2].get(row['latest year available'])
+                if date_id is None:
+                    print(f"Date of '{row['latest year available']}' not found in date_dim.")
+                    #continue    # Skip this row if location_id is not found
+            else : date_id = 1
+
             location_id = lookupTables[0].get(row['Country'])
             if location_id is None:
                 print(f"Location of '{row['Country']}' not found in location_dim.")
@@ -95,12 +98,13 @@ def loadDataFrame(df, connection, lookupTables):
                 measurement_value = round(row[column], 3) # Round to 3 decimal places
                 
                 insert_mv = text('''
-                    INSERT INTO "Environment_Fact" (location_id, param_id, measurement_value)
-                    VALUES (:location_id, :param_id, :measurement_value)
+                    INSERT INTO "Environment_Fact" (date_id, location_id, param_id, measurement_value)
+                    VALUES (:date_id, :location_id, :param_id, :measurement_value)
                     ON CONFLICT DO NOTHING;
                 ''')
                 
                 connection.execute(insert_mv, {
+                    'date_id': date_id,
                     'location_id': location_id,
                     'param_id': param_id,
                     'measurement_value': measurement_value

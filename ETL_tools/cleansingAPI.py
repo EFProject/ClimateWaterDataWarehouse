@@ -17,7 +17,11 @@ def handleMissingValuesRemoval(df, threshold):
 	df.dropna(axis=0, thresh=row_threshold, inplace=True)			# Drop rows with threshold% or more missing values
 	df.dropna(axis=1, thresh=col_threshold, inplace=True)			# Drop columns with threshold% or more missing values
 
-	return df.reset_index(drop=True)
+	first_row = df.iloc[[0]]																# exclude row with unit of mea
+	df.dropna(axis=0, subset=['Country', 'latest year available'], inplace=True)			# Drop all rows where 'Country' or 'latest year available' has NaN values
+	df_cleaned = pd.concat([first_row, df], ignore_index=True)								
+
+	return df_cleaned.reset_index(drop=True)
 
 
 def handleMissingValuesImputation(df):
