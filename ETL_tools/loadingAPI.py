@@ -10,64 +10,61 @@ def loadDataFrame(df, connection, lookupTables):
 
         ### Date_Dim handler
 
-        if 'latest year available' in non_numericalColumns.columns and not non_numericalColumns['latest year available'].empty:
-            for date in non_numericalColumns['latest year available']:
-                if not date in lookupTables[2] :
-                    insert_date = text('''
-                                        INSERT INTO "Date_Dim" (date, month, quarter, year) 
-                                        VALUES (:date, :month, :quarter, :year)
-                                        RETURNING date_id;
-                                        ''')
-                    new_insert = connection.execute(insert_date, {
-                        'date': date,
-                        'month': date.month,
-                        'quarter': "Q1",
-                        'year': date.year
-                    })
-                    date_id = new_insert.fetchone()[0]
-                    lookupTables[2][date] = date_id
-            print("The 'Date_Dim' table correctly populated")
-        else:
-            print("The 'latest year available' column is either missing or empty in the DataFrame.")
+        for date in non_numericalColumns['Date']:
+            if not date in lookupTables[2] :
+                insert_date = text('''
+                                    INSERT INTO "Date_Dim" (date, month, quarter, year) 
+                                    VALUES (:date, :month, :quarter, :year)
+                                    RETURNING date_id;
+                                    ''')
+                if date.month in [1, 2, 3, 4]:
+                    quarter = "Q1"
+                elif date.month in [5, 6, 7, 8]:
+                    quarter = "Q2"
+                elif date.month in [9, 10, 11, 12]:
+                    quarter = "Q3"
+                new_insert = connection.execute(insert_date, {
+                    'date': date,
+                    'month': date.month,
+                    'quarter': quarter,
+                    'year': date.year
+                })
+                date_id = new_insert.fetchone()[0]
+                lookupTables[2][date] = date_id
+        print("The 'Date_Dim' table correctly populated")
 
         ### Location_Dim handler
 
-        if 'Country' in non_numericalColumns.columns and not non_numericalColumns['Country'].empty:
-            for country in non_numericalColumns['Country']:
-                if not country in lookupTables[0] :
-                    insert_country = text('''
-                                        INSERT INTO "Location_Dim" (country) 
-                                        VALUES (:country)
-                                        RETURNING location_id;
-                                        ''')
-                    new_insert = connection.execute(insert_country, {'country': country})
-                    location_id = new_insert.fetchone()[0]
-                    lookupTables[0][country] = location_id
-            print("The 'Location_Dim' table correctly populated")
-        else:
-            print("The 'Country' column is either missing or empty in the DataFrame.")
+        for country in non_numericalColumns['Country']:
+            if not country in lookupTables[0] :
+                insert_country = text('''
+                                    INSERT INTO "Location_Dim" (country) 
+                                    VALUES (:country)
+                                    RETURNING location_id;
+                                    ''')
+                new_insert = connection.execute(insert_country, {'country': country})
+                location_id = new_insert.fetchone()[0]
+                lookupTables[0][country] = location_id
+        print("The 'Location_Dim' table correctly populated")
 
         ### Param_Dim handler
 
-        if not non_numericalRows.empty:
-            non_numericalRows = non_numericalRows.iloc[:,1:]
-            for column_name in non_numericalRows.columns:
-                if not column_name in lookupTables[1] :
-                    unit_of_measure = non_numericalRows.loc[0, column_name]
-                    insert_param = text("""
-                        INSERT INTO "Param_Dim" (param_name, unit_of_measure)
-                        VALUES (:param_name, :unit_of_measure)
-                        RETURNING param_id;
-                    """)
-                    new_insert = connection.execute(insert_param, {
-                        'param_name': column_name,
-                        'unit_of_measure': unit_of_measure
-                    })
-                    param_id = new_insert.fetchone()[0]
-                    lookupTables[1][column_name] = param_id
-            print("The 'Param_Dim' table correctly populated")
-        else:
-            print("The row with unit of measures is either missing or empty in the DataFrame.")
+        non_numericalRows = non_numericalRows.iloc[:,2:]
+        for column_name in non_numericalRows.columns:
+            if not column_name in lookupTables[1] :
+                unit_of_measure = non_numericalRows.loc[0, column_name]
+                insert_param = text("""
+                    INSERT INTO "Param_Dim" (param_name, unit_of_measure)
+                    VALUES (:param_name, :unit_of_measure)
+                    RETURNING param_id;
+                """)
+                new_insert = connection.execute(insert_param, {
+                    'param_name': column_name,
+                    'unit_of_measure': unit_of_measure
+                })
+                param_id = new_insert.fetchone()[0]
+                lookupTables[1][column_name] = param_id
+        print("The 'Param_Dim' table correctly populated")
 
 
         print("\n LookupTables status:")
@@ -77,19 +74,18 @@ def loadDataFrame(df, connection, lookupTables):
         ### Environment_Fact handler
 
         for index, row in df.iloc[1:].iterrows():
-            if 'latest year available' in non_numericalColumns.columns :
-                date_id = lookupTables[2].get(row['latest year available'])
-                if date_id is None:
-                    print(f"Date of '{row['latest year available']}' not found in date_dim.")
-                    #continue    # Skip this row if location_id is not found
-            else : date_id = 1
+
+            date_id = lookupTables[2].get(row['Date'])
+            if date_id is None:
+                print(f"Date of '{row['Date']}' not found in date_dim.")
+                #continue    # Skip this row if location_id is not found
 
             location_id = lookupTables[0].get(row['Country'])
             if location_id is None:
                 print(f"Location of '{row['Country']}' not found in location_dim.")
                 #continue    # Skip this row if location_id is not found
             
-            for column in df.columns[len(non_numericalColumns.columns):]:
+            for column in df.columns[2:]:
                 param_id = lookupTables[1].get(column)
                 if param_id is None:
                     print(f"Parameter '{column}' not found in param_dim.")

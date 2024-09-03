@@ -19,12 +19,15 @@ def extractClimateData():
 	GEI_AC_2 = read_excel_file(GEIPath + 'Air and Climate/CO2_Emissions.xlsx', 0, 16, None, "B,C,E,G,I", 0, False, 0)
 	GEI_AC_3 = read_excel_file(GEIPath + 'Air and Climate/GHG_by_Sector_Perc.xlsx', 0, 29, None, "B:I", 0, False, 0)
 	GEI_AC_4 = read_excel_file(GEIPath + 'Air and Climate/GHG_Emissions_by_Sector.xlsx', 0, 16, None, "B:I", 0, False, 0)
-	GEI_AC_5 = read_excel_file(GEIPath + 'Air and Climate/GHG_Emissions.xlsx', None, 16, None, "B,C,D,F,H,J", 0, False, 0)
-	GEI_AC_6 = read_excel_file(GEIPath + 'Air and Climate/NOx_Emissions.xlsx', None, 16, None, "B,C,D,F,H", 0, False, 0)
-	GEI_AC_7 = read_excel_file(GEIPath + 'Air and Climate/ODS_Consumption.xlsx', None, 20, None, "B,C,E,G,I,K,M", 0, False, 0)
-	GEI_AC_8 = read_excel_file(GEIPath + 'Air and Climate/SO2_emissions.xlsx', None, 17, None, "B,C,D,F,H", 0, False, 0)
+	GEI_AC_5 = read_excel_file(GEIPath + 'Air and Climate/GHG_Emissions.xlsx', 0, 16, None, "B,C,D,F,H,J", 0, False, 20)
+	GEI_AC_6 = read_excel_file(GEIPath + 'Air and Climate/NOx_Emissions.xlsx', 0, 16, None, "B,C,D,F,H", 0, False, 21)
+	GEI_AC_7_A = read_excel_file(GEIPath + 'Air and Climate/ODS_Consumption.xlsx', 0, 20, None, "B,C,I", 0, False, 31)
+	GEI_AC_7_B = read_excel_file(GEIPath + 'Air and Climate/ODS_Consumption.xlsx', 0, 20, None, "B,K", 0, False, 31)
+	GEI_AC_8 = read_excel_file(GEIPath + 'Air and Climate/SO2_emissions.xlsx', 0, 17, None, "B,C,D,F,H", 0, False, 20)
 
-	GEI = [GEI_AC_1, GEI_AC_2, GEI_AC_3, GEI_AC_4, GEI_AC_5, GEI_AC_6, GEI_AC_7, GEI_AC_8]
+	GEI = {"CH4_N2O_Emissions": GEI_AC_1, "CO2_Emissions": GEI_AC_2, "GHG_by_Sector_Perc": GEI_AC_3, "GHG_Emissions_by_Sector": GEI_AC_4, 
+			"GHG_Emissions": GEI_AC_5, "NOx_Emissions": GEI_AC_6, "ODS_Consumption_2002": GEI_AC_7_A, "ODS_Consumption_2013": GEI_AC_7_B, 
+			"SO2_emissions": GEI_AC_8}
 
 	KGC_1 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/Koeppen-Geiger-ASCII.txt', 0, None, None)
 	KGC_2 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/TableDefinitions.csv', 0, None, None)

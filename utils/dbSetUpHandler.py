@@ -56,7 +56,7 @@ def setUpDB(connection):
 									param_id INT REFERENCES "ClimateWaterDataWarehouse"."Param_Dim"(param_id),
 						  			source_id INT REFERENCES "ClimateWaterDataWarehouse"."Source_Dim"(source_id),
 									measurement_value FLOAT(24),
-						  			CONSTRAINT unique_mv UNIQUE (date_id, location_id, param_id, source_id)
+						  			CONSTRAINT unique_mv UNIQUE (date_id, location_id, param_id)
 								);
 								'''))
 
