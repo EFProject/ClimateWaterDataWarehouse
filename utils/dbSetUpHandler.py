@@ -24,11 +24,12 @@ def setUpDB(connection):
 		connection.execute(text('''
 								CREATE TABLE IF NOT EXISTS "Location_Dim" (
 									location_id SERIAL PRIMARY KEY,
-									country VARCHAR(255) UNIQUE NOT NULL,
-									state VARCHAR(255) UNIQUE,
-									city VARCHAR(255) UNIQUE,
-									latitude VARCHAR(255) UNIQUE,
-									longitude VARCHAR(255) UNIQUE
+									country VARCHAR(255) NOT NULL,
+									city VARCHAR(255),
+									latitude VARCHAR(255),
+									longitude VARCHAR(255),
+						  			CONSTRAINT unique_location UNIQUE (country, city),
+									CONSTRAINT global_position UNIQUE (latitude, longitude)
 								);
 								'''))
 		connection.execute(text('''

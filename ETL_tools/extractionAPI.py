@@ -4,6 +4,8 @@
 import os
 import glob
 
+import numpy as np
+
 from utils.pandasAPI import *
 
 def extractClimateData():
@@ -12,6 +14,8 @@ def extractClimateData():
 	climatePath = basePath + '/datasets/Climate-Dataset/'
 
 	CID = read_csv_file(climatePath + '1.1_Climate_Insights_Dataset/climate_change_data.csv', 0, None, None)
+	unit_of_measure = {'Country': np.nan, 'Date': np.nan, 'Location': np.nan, 'Temperature': "Celsius", 'CO2 Emissions': "mio. tonnes", 'Sea Level Rise': "millimiters", 'Precipitation': "millimiters", 'Humidity': "%", 'Wind Speed': "km/h"}
+	CID = pd.concat([pd.DataFrame([unit_of_measure]), CID], ignore_index=True)
 
 	GEIPath = climatePath + '1.2_Global_Environmental_Indicators/'
 
@@ -51,7 +55,9 @@ def extractClimateExtraData():
 	GEI_AC_7 = read_excel_file(GEIPath + 'Air and Climate/ODS_Consumption.xlsx', 0, 192, None, "A", 0, False, 0)
 	GEI_AC_8 = read_excel_file(GEIPath + 'Air and Climate/SO2_emissions.xlsx', 0, 153, None, "A", 0, False, 0)
 
-	GEI_Sources = [
+	sourceData = [
+			{ "nameDF" : "CID", "source_name" : "Kaggle_Climate Insights Dataset", "source_link" : "https://www.kaggle.com/datasets/goyaladi/climate-insights-dataset", "source_data_quality" : "Not provided"},
+
 			{ "nameDF" : "CH4_N2O_Emissions", "source_name" : GEI_AC_2.loc[1, 'Sources:'], "source_link" : GEI_AC_2.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_2.loc[13, 'Sources:']},
 			{ "nameDF" : "CO2_Emissions", "source_name" : GEI_AC_2.loc[1, 'Sources:'], "source_link" : GEI_AC_2.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_2.loc[13, 'Sources:']},
 			{ "nameDF" : "GHG_by_Sector_Perc", "source_name" : GEI_AC_3.loc[1, 'Sources:'], "source_link" : GEI_AC_3.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_3.loc[16, 'Sources:']},
@@ -63,8 +69,9 @@ def extractClimateExtraData():
 			{ "nameDF" : "SO2_emissions", "source_name" : GEI_AC_8.loc[1, 'Sources:'], "source_link" : GEI_AC_8.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_8.loc[25, 'Sources:']}
 		]
 	
-	GEI_Parameters = {
+	parameterData = {
 		"CO2 emissions" : GEI_AC_2.loc[8, 'Sources:'], 
+		f"GHG % from Energy" : GEI_AC_3.loc[6, 'Sources:'], f"GHG % from Energy of which: from Transport" : GEI_AC_3.loc[7, 'Sources:'], f"GHG % from Industrial Processes" : GEI_AC_3.loc[8, 'Sources:'], f"GHG % from Agriculture" : GEI_AC_3.loc[9, 'Sources:'], f"GHG % from Waste" : GEI_AC_3.loc[10, 'Sources:'],
 		"GHG from Energy" : GEI_AC_3.loc[6, 'Sources:'], "GHG from Energy of which: from Transport" : GEI_AC_3.loc[7, 'Sources:'], "GHG from Industrial Processes" : GEI_AC_3.loc[8, 'Sources:'], "GHG from Agriculture" : GEI_AC_3.loc[9, 'Sources:'], "GHG from Waste" : GEI_AC_3.loc[10, 'Sources:'],
 		"Total GHG emissions " : GEI_AC_5.loc[11, 'Sources:'], "Total GHG emissions including LULUCF/LUCF" : GEI_AC_5.loc[12, 'Sources:'], 
 		"NOx emissions" : GEI_AC_6.loc[22, 'Sources:'], 
@@ -72,7 +79,7 @@ def extractClimateExtraData():
 		"SO2 emissions" : GEI_AC_8.loc[15, 'Sources:'], 
 	}
 
-	return GEI_Sources, GEI_Parameters
+	return sourceData, parameterData
 
 
 def extractEnvironmentalData():

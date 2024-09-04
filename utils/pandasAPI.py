@@ -35,12 +35,12 @@ def read_csv_file(file_path, header, index_col, usecols):
         return None
     
 
-def getNumericalData(df):
+def getNumericalData(df, nnnRows, nnnColumns):
     
-    numericalDf = df.iloc[1:, 2:] 		                # Dataframe with numerical rows and columns
+    numericalDf = df.iloc[nnnRows:, nnnColumns:] 		                # Dataframe with numerical rows and columns
 
-    non_numericalRows = df.iloc[:1, :]					# Dataframe with rows excluded
-    non_numericalColumns = df.iloc[1:, :2]	            # Dataframe with columns excluded
+    non_numericalRows = df.iloc[:nnnRows, :]					# Dataframe with rows excluded
+    non_numericalColumns = df.iloc[nnnRows:, :nnnColumns]	            # Dataframe with columns excluded
 
     #print(non_numericalRows, "\n", non_numericalColumns)
 

@@ -38,22 +38,47 @@ def standardize_datetime_format(value):
 		if value == "..." or  value == "" or value == "…" : return np.nan
 		year = int(value)
 		month = 1
-		#quarter = 'Q1'
 		date_obj = date(year, month=month, day=1)
 		return date_obj
 	
 	return value
 
+def standardize_datetime_format_CID(value):
+
+		
+	if value == "..." or  value == "" or value == "…" : return np.nan
+
+	date = pd.to_datetime(value).date()
+	date = date.replace(day=1)
+	
+	return date
+
 
 def applyStandardizationFormat(df):
 
-	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df)				# Separate numerical Data from not numerical Data
+	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df, 1, 2)				# Separate numerical Data from not numerical Data
 
 	numericalDf = numericalDf.map(standardize_numerical_format)								# Apply the standardization function
 
 	non_numericalRows = non_numericalRows.map(standardize_string_format)	
 	non_numericalColumns['Country'] = non_numericalColumns['Country'].map(standardize_string_format)	
 	non_numericalColumns['Date'] = non_numericalColumns['Date'].map(standardize_datetime_format)
+	
+	dfFormatted = pd.concat([non_numericalColumns, numericalDf], axis=1).reset_index(drop=True)
+	dfFormatted = pd.concat([non_numericalRows, dfFormatted], axis=0).reset_index(drop=True)
+
+	return dfFormatted
+
+def applyStandardizationFormatCID(df):
+
+	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df, 1, 3)				
+
+	numericalDf = numericalDf.map(standardize_numerical_format)								# Apply the standardization function
+
+	non_numericalRows = non_numericalRows.map(standardize_string_format)	
+	non_numericalColumns['Country'] = non_numericalColumns['Country'].map(standardize_string_format)
+	non_numericalColumns['Location'] = non_numericalColumns['Location'].map(standardize_string_format)	
+	non_numericalColumns['Date'] = non_numericalColumns['Date'].map(standardize_datetime_format_CID)
 	
 	dfFormatted = pd.concat([non_numericalColumns, numericalDf], axis=1).reset_index(drop=True)
 	dfFormatted = pd.concat([non_numericalRows, dfFormatted], axis=0).reset_index(drop=True)

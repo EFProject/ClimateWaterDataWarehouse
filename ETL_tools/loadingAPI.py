@@ -4,7 +4,7 @@ from utils.pandasAPI import *
 
 def loadDataFrame(df, connection, lookupTables, source_id):
 
-    numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df)
+    numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df, 1, 2)
 
     try:
 

@@ -17,7 +17,7 @@ def handleMissingValuesRemoval(df, threshold):
 	df.dropna(axis=0, thresh=row_threshold, inplace=True)			# Drop rows with threshold% or more missing values
 	df.dropna(axis=1, thresh=col_threshold, inplace=True)			# Drop columns with threshold% or more missing values
 
-	first_row = df.iloc[[0]]																# exclude row with unit of mea
+	first_row = df.iloc[[0]]																# exclude row with unit of measure
 	df.dropna(axis=0, subset=['Country', 'Date'], inplace=True)			# Drop all rows where 'Country' or 'Date' has NaN values
 	df_cleaned = pd.concat([first_row, df], ignore_index=True)								
 
@@ -26,12 +26,12 @@ def handleMissingValuesRemoval(df, threshold):
 
 def handleMissingValuesImputation(df):
 
-	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df)			# Separate numerical Data from not numerical Data
+	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df, 1, 2)			# Separate numerical Data from not numerical Data
 
-	imputer = IterativeImputer(max_iter=10, random_state=0)								# Use IterativeImputer to perform Imputation
+	imputer = IterativeImputer(max_iter=10, random_state=0)										# Use IterativeImputer to perform Imputation
 	imputed_array = imputer.fit_transform(numericalDf)
 	imputed_numerical_df = pd.DataFrame(imputed_array, columns=numericalDf.columns)
-	imputed_numerical_df.index = imputed_numerical_df.index + 1 						# Resetting the index to start from the number of excluded rows
+	imputed_numerical_df.index = imputed_numerical_df.index + 1 								# Resetting the index to start from the number of excluded rows
 
 	#print("\n Numerical data after imputation: \n", imputed_numerical_df)
 
