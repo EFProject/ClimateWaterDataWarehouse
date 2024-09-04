@@ -2,7 +2,7 @@ import datetime
 from sqlalchemy import text
 from utils.pandasAPI import *
 
-def loadDataFrame(df, connection, lookupTables):
+def loadDataFrame(df, connection, lookupTables, source_id):
 
     numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df)
 
@@ -94,8 +94,8 @@ def loadDataFrame(df, connection, lookupTables):
                 measurement_value = round(row[column], 3) # Round to 3 decimal places
                 
                 insert_mv = text('''
-                    INSERT INTO "Environment_Fact" (date_id, location_id, param_id, measurement_value)
-                    VALUES (:date_id, :location_id, :param_id, :measurement_value)
+                    INSERT INTO "Environment_Fact" (date_id, location_id, param_id, source_id, measurement_value)
+                    VALUES (:date_id, :location_id, :param_id, :source_id, :measurement_value)
                     ON CONFLICT DO NOTHING;
                 ''')
                 
@@ -103,6 +103,7 @@ def loadDataFrame(df, connection, lookupTables):
                     'date_id': date_id,
                     'location_id': location_id,
                     'param_id': param_id,
+                    'source_id': source_id,
                     'measurement_value': measurement_value
                 })
 
@@ -112,6 +113,76 @@ def loadDataFrame(df, connection, lookupTables):
         
 
         #numericalDf.to_sql("Location_Dim", connection, schema='ClimateWaterDataWarehouse', if_exists='replace', index=False)
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+def loadSourceData(connection, sourceData):
+        
+    try:
+        
+        ### Source_Dim handler
+
+        lookupSourceTable = {}
+
+        for source in sourceData:
+
+            nameDF = source['nameDF']
+            source_name = source['source_name']
+            source_link = source['source_link']
+            source_data_quality = source['source_data_quality']
+
+            insert_source = text('''
+                                INSERT INTO "Source_Dim" (source_name, source_link, source_data_quality) 
+                                VALUES (:source_name, :source_link, :source_data_quality)
+                                ON CONFLICT (source_name) DO NOTHING
+                                RETURNING source_id;
+                                ''')
+            new_insert = connection.execute(insert_source, {
+                    'source_name': source_name,
+                    'source_link': source_link,
+                    'source_data_quality': source_data_quality
+                })
+            
+            source_id = new_insert.fetchone()
+    
+            if source_id:
+                lookupSourceTable[nameDF] = source_id[0]
+            else:
+                # If the insert failed due to conflict, retrieve the existing source_id
+                select_source_id = text('''
+                    SELECT source_id FROM "Source_Dim" WHERE source_name = :source_name;
+                ''')
+                existing_source_id = connection.execute(select_source_id, {'source_name': source_name}).fetchone()
+                
+                if existing_source_id:
+                    lookupSourceTable[nameDF] = existing_source_id[0]
+        print("The 'Source_Dim' table correctly populated")
+
+        return lookupSourceTable
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+def loadExtraData(connection, paramData):
+        
+    try:
+
+        ### Param_Dim handler
+
+        for param in paramData:
+            update_param = text("""
+                UPDATE "Param_Dim"
+                SET description = :description
+                WHERE param_name = :param_name;
+            """)
+            connection.execute(update_param, {
+                'param_name': param,
+                'description': paramData[param]
+            })
+        print("The 'Param_Dim' description column correctly populated \n")
 
     except Exception as e:
         print(f"An error occurred: {e}")

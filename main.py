@@ -23,6 +23,10 @@ lookupTables = getLookupTable(dbConnection)
 
 climateDF = extractClimateData()
 
+sourceData, parameterData = extractClimateExtraData()
+lookupTables.append(loadSourceData(dbConnection, sourceData))
+
+
 for dfName, dfExtracted in climateDF[1].items():
     
     #print(f"\nDataframe after extraction: {dfName}\n", dfExtracted)
@@ -56,5 +60,9 @@ for dfName, dfExtracted in climateDF[1].items():
 
 	### LOADING ###
 
-	loadDataFrame(dfImputated, dbConnection, lookupTables)
+	source_id = lookupTables[3][dfName]
+	loadDataFrame(dfImputated, dbConnection, lookupTables, source_id)
 	print (f"### {dfName} correctly loaded into ClimateWaterDataWarehouse ###\n")
+
+loadExtraData(dbConnection, parameterData)
+print (f"### Extra Data correctly loaded into ClimateWaterDataWarehouse ###\n")

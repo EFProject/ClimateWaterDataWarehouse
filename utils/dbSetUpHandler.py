@@ -38,15 +38,16 @@ def setUpDB(connection):
 									unit_of_measure VARCHAR(255) NOT NULL,
 									category VARCHAR(255),
 									threshold_value FLOAT(53),
-									description VARCHAR(255)
+									description VARCHAR(2000)
 								);
 								'''))
 		connection.execute(text('''
 								CREATE TABLE IF NOT EXISTS "Source_Dim" (
 									source_id SERIAL PRIMARY KEY,
 									source_name VARCHAR(255) UNIQUE NOT NULL,
+									source_link VARCHAR(255),
 									source_type VARCHAR(255),
-									description VARCHAR(255)
+									source_data_quality VARCHAR(1000)
 								);
 								'''))
 		connection.execute(text('''
@@ -56,7 +57,7 @@ def setUpDB(connection):
 									param_id INT REFERENCES "ClimateWaterDataWarehouse"."Param_Dim"(param_id),
 						  			source_id INT REFERENCES "ClimateWaterDataWarehouse"."Source_Dim"(source_id),
 									measurement_value FLOAT(24),
-						  			CONSTRAINT unique_mv UNIQUE (date_id, location_id, param_id)
+						  			CONSTRAINT unique_mv UNIQUE (date_id, location_id, param_id, source_id)
 								);
 								'''))
 
