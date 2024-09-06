@@ -20,11 +20,13 @@ def read_excel_file(file_path, sheet_name, header, index_col, usecols, skiprows,
         return None
 
 
-def read_csv_file(file_path, header, index_col, usecols):
+def read_csv_file(file_path, sep, header, index_col, usecols):
     """Load the CSV file into a DataFrame"""
     try:
         df = pd.read_csv(
             file_path,  
+            sep=sep,
+            engine='python',
             header=header, 				# Row (0-indexed) to use for the column labels of the parsed DataFrame
             index_col=index_col,		# Column (0-indexed) to use as the row labels of the DataFrame
             usecols=usecols,			# Column letters or Column Ranges to be parsed

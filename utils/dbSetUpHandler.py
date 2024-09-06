@@ -28,8 +28,8 @@ def setUpDB(connection):
 									city VARCHAR(255),
 									latitude VARCHAR(255),
 									longitude VARCHAR(255),
-						  			CONSTRAINT unique_location UNIQUE (country, city),
-									CONSTRAINT global_position UNIQUE (latitude, longitude)
+						  			climate_zone VARCHAR(255),
+						  			CONSTRAINT unique_location UNIQUE (country, city)
 								);
 								'''))
 		connection.execute(text('''

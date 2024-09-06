@@ -1,5 +1,7 @@
 import datetime
+import numpy as np
 from sqlalchemy import text
+from utils.formulas import find_closest, round_to_nearest_quarter
 from utils.pandasAPI import *
 
 def loadDataFrame(df, connection, lookupTables, nnnColumns, source_id):
@@ -170,7 +172,7 @@ def loadSourceData(connection, sourceData):
         print(f"An error occurred: {e}")
 
 
-def loadExtraData(connection, paramData):
+def loadExtraData(connection, paramData, locationData):
         
     try:
 
@@ -187,6 +189,38 @@ def loadExtraData(connection, paramData):
                 'description': paramData[param]
             })
         print("The 'Param_Dim' description column correctly populated \n")
+
+        ### Location_Dim handler
+        print(locationData[0],locationData[1],locationData[2])
+        for index, row in locationData[2].iterrows():
+            latitude = pd.to_numeric(row['latitude'], errors='coerce')
+            longitude = pd.to_numeric(row['longitude'], errors='coerce')
+            country = row['country']
+            
+            if pd.notna(latitude) and pd.notna(longitude):
+                # Round latitude and longitude to the nearest 0.25 or 0.75
+                rounded_latitude = round_to_nearest_quarter(latitude)
+                rounded_longitude = round_to_nearest_quarter(longitude)
+
+                # Check for the closest available row in locationData[0]
+                closest_row = find_closest(rounded_latitude, rounded_longitude, locationData[0])
+                cls_value = closest_row['Cls']
+                #print(f"Lat {rounded_latitude}, Lon {rounded_longitude} is closest to Lat {closest_row['Lat']}, Lon {closest_row['Lon']} with Cls {cls_value}")
+
+                update_location = text("""
+                    UPDATE "Location_Dim"
+                    SET latitude = :latitude, longitude = :longitude
+                    WHERE country = :country;
+                """)
+                connection.execute(update_location, {
+                    'country': country,
+                    'latitude': rounded_latitude,
+                    'longitude': rounded_longitude
+                })
+
+
+        print("The 'Location_Dim' latitude and longitude correctly populated \n")
+
 
     except Exception as e:
         print(f"An error occurred: {e}")

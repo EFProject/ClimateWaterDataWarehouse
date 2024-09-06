@@ -13,13 +13,13 @@ def extractClimateData():
 	basePath = os.getcwd()
 	climatePath = basePath + '/datasets/Climate-Dataset/'
 
-	CID = read_csv_file(climatePath + '1.1_Climate_Insights_Dataset/climate_change_data.csv', 0, None, None)
+	CID = read_csv_file(climatePath + '1.1_Climate_Insights_Dataset/climate_change_data.csv', ",", 0, None, None)
 	unit_of_measure = {'Country': np.nan, 'Date': np.nan, 'Location': np.nan, 'Temperature': "Celsius", 'CO2 emissions': "mio. tonnes", 'Sea Level Rise': "millimiters", 'Precipitation': "millimiters", 'Humidity': "%", 'Wind Speed': "km/h"}
 	CID = pd.concat([pd.DataFrame([unit_of_measure]), CID], ignore_index=True)
 
 	GEIPath = climatePath + '1.2_Global_Environmental_Indicators/'
 
-	GEI_AC_1 = read_csv_file(GEIPath + 'Air and Climate/CH4_N2O_Emissions.csv', 0, None, None)
+	GEI_AC_1 = read_csv_file(GEIPath + 'Air and Climate/CH4_N2O_Emissions.csv', ",", 0, None, None)
 	GEI_AC_2 = read_excel_file(GEIPath + 'Air and Climate/CO2_Emissions.xlsx', 0, 16, None, "B,C,E,G,I", 0, False, 0)
 	GEI_AC_3 = read_excel_file(GEIPath + 'Air and Climate/GHG_by_Sector_Perc.xlsx', 0, 29, None, "B:I", 0, False, 0)
 	GEI_AC_4 = read_excel_file(GEIPath + 'Air and Climate/GHG_Emissions_by_Sector.xlsx', 0, 16, None, "B:I", 0, False, 0)
@@ -32,13 +32,9 @@ def extractClimateData():
 	GEI = {"CH4_N2O_Emissions": GEI_AC_1, "CO2_Emissions": GEI_AC_2, "GHG_by_Sector_Perc": GEI_AC_3, "GHG_Emissions_by_Sector": GEI_AC_4, 
 			"GHG_Emissions": GEI_AC_5, "NOx_Emissions": GEI_AC_6, "ODS_Consumption_2002": GEI_AC_7_A, "ODS_Consumption_2013": GEI_AC_7_B, 
 			"SO2_emissions": GEI_AC_8}
+	
 
-	KGC_1 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/Koeppen-Geiger-ASCII.txt', 0, None, None)
-	KGC_2 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/TableDefinitions.csv', 0, None, None)
-
-	KGC = [KGC_1, KGC_2]
-
-	return [CID, GEI, KGC]
+	return [CID, GEI]
 
 def extractClimateExtraData():
 
@@ -54,6 +50,15 @@ def extractClimateExtraData():
 	GEI_AC_6 = read_excel_file(GEIPath + 'Air and Climate/NOx_Emissions.xlsx', 0, 185, None, "A", 0, False, 0)
 	GEI_AC_7 = read_excel_file(GEIPath + 'Air and Climate/ODS_Consumption.xlsx', 0, 192, None, "A", 0, False, 0)
 	GEI_AC_8 = read_excel_file(GEIPath + 'Air and Climate/SO2_emissions.xlsx', 0, 153, None, "A", 0, False, 0)
+
+	KGC_1 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/Koeppen-Geiger-ASCII.txt', "\s+", 0, None, None)
+
+	KGC_2 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/TableDefinitions.csv', ",", 0, None, None)
+
+	LAL = read_csv_file(climatePath + '1.4_Latitude_and_Longitude\world_country_and_usa_states_latitude_and_longitude_values.csv', ",", 0, None, ['latitude','longitude','country','usa_state_latitude','usa_state_longitude','usa_state'])
+	LAL.rename(columns={'usa_state_latitude': 'latitude', 'usa_state_longitude': 'longitude', 'usa_state': 'country'}, inplace=True)
+	LAL = pd.concat([LAL.iloc[:,:3], LAL.iloc[:,3:]], axis=0).reset_index(drop=True)
+	LAL.dropna(axis=0, how='all', inplace=True)
 
 	sourceData = [
 			{ "nameDF" : "CID", "source_name" : "Kaggle_Climate Insights Dataset", "source_link" : "https://www.kaggle.com/datasets/goyaladi/climate-insights-dataset", "source_data_quality" : "Not provided"},
@@ -79,7 +84,9 @@ def extractClimateExtraData():
 		"SO2 emissions" : GEI_AC_8.loc[15, 'Sources:'], 
 	}
 
-	return sourceData, parameterData
+	locationData = [KGC_1,KGC_2,LAL]
+
+	return sourceData, parameterData, locationData
 
 
 def extractEnvironmentalData():
