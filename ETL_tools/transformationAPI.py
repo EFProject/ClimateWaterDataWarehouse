@@ -74,6 +74,7 @@ def applyStandardizationFormatCID(df):
 	numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df, 1, 3)				
 
 	numericalDf = numericalDf.map(standardize_numerical_format)								# Apply the standardization function
+	numericalDf['CO2 emissions'] = numericalDf['CO2 emissions'] / 1000
 
 	non_numericalRows = non_numericalRows.map(standardize_string_format)	
 	non_numericalColumns['Country'] = non_numericalColumns['Country'].map(standardize_string_format)
@@ -82,6 +83,8 @@ def applyStandardizationFormatCID(df):
 	
 	dfFormatted = pd.concat([non_numericalColumns, numericalDf], axis=1).reset_index(drop=True)
 	dfFormatted = pd.concat([non_numericalRows, dfFormatted], axis=0).reset_index(drop=True)
+
+	dfFormatted.rename(columns={'Location': 'City'}, inplace=True)
 
 	return dfFormatted
 

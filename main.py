@@ -29,7 +29,7 @@ lookupTables.append(loadSourceData(dbConnection, sourceData))
 
 CID_dataset_ETL(climateDF[0], 0.8, dbConnection, lookupTables)
 
-#GEI_dataset_ETL(climateDF[1].items(), 0.8, dbConnection, lookupTables)
+GEI_dataset_ETL(climateDF[1].items(), 0.8, dbConnection, lookupTables)
 
 
 loadExtraData(dbConnection, parameterData)

@@ -14,7 +14,7 @@ def extractClimateData():
 	climatePath = basePath + '/datasets/Climate-Dataset/'
 
 	CID = read_csv_file(climatePath + '1.1_Climate_Insights_Dataset/climate_change_data.csv', 0, None, None)
-	unit_of_measure = {'Country': np.nan, 'Date': np.nan, 'Location': np.nan, 'Temperature': "Celsius", 'CO2 Emissions': "mio. tonnes", 'Sea Level Rise': "millimiters", 'Precipitation': "millimiters", 'Humidity': "%", 'Wind Speed': "km/h"}
+	unit_of_measure = {'Country': np.nan, 'Date': np.nan, 'Location': np.nan, 'Temperature': "Celsius", 'CO2 emissions': "mio. tonnes", 'Sea Level Rise': "millimiters", 'Precipitation': "millimiters", 'Humidity': "%", 'Wind Speed': "km/h"}
 	CID = pd.concat([pd.DataFrame([unit_of_measure]), CID], ignore_index=True)
 
 	GEIPath = climatePath + '1.2_Global_Environmental_Indicators/'

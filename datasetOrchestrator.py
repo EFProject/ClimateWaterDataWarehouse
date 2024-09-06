@@ -22,7 +22,7 @@ def CID_dataset_ETL(dfCID, threshold, dbConnection, lookupTables):
 	#print(f"\n Dataframe after DuplicatesRemoval : \n",dfCleaned)
 
 	dfCleaned = handleMissingValuesRemoval(dfCleaned, threshold)
-	print(f"\n Dataframe after MissingValuesRemoval : \n",dfCleaned)
+	#print(f"\n Dataframe after MissingValuesRemoval : \n",dfCleaned)
 
 	#dfImputated = handleMissingValuesImputation(dfCleaned)
 	#print(f"\n Dataframe after MissingValuesImputation: \n",dfImputated)
@@ -38,7 +38,7 @@ def CID_dataset_ETL(dfCID, threshold, dbConnection, lookupTables):
 	### LOADING ###
 
 	source_id = lookupTables[3]["CID"]
-	#loadDataFrame(dfCleaned, dbConnection, lookupTables, source_id)
+	loadDataFrame(dfCleaned, dbConnection, lookupTables, 3, source_id)
 	print (f"### CID DATASET correctly loaded into ClimateWaterDataWarehouse ###\n")
 
 
@@ -82,5 +82,5 @@ def GEI_dataset_ETL(dfGEI, threshold, dbConnection, lookupTables):
 		### LOADING ###
 
 		source_id = lookupTables[3][dfName]
-		loadDataFrame(dfImputated, dbConnection, lookupTables, source_id)
+		loadDataFrame(dfImputated, dbConnection, lookupTables, 2, source_id)
 		print (f"### {dfName} correctly loaded into ClimateWaterDataWarehouse ###\n")

@@ -81,10 +81,10 @@ def getLookupTable(connection):
 
     location_ids = {}
     location_data = connection.execute(text('''
-                                        SELECT country, location_id
+                                        SELECT country, city, location_id
                                         FROM "Location_Dim"
                                     ''')).fetchall()
-    location_ids = {row[0]: row[1] for row in location_data}
+    location_ids = {(row[0], row[1]): row[2] for row in location_data}
 
     # LookupTable of Param_Dim
 

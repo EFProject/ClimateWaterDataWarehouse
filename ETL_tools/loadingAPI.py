@@ -2,9 +2,9 @@ import datetime
 from sqlalchemy import text
 from utils.pandasAPI import *
 
-def loadDataFrame(df, connection, lookupTables, source_id):
+def loadDataFrame(df, connection, lookupTables, nnnColumns, source_id):
 
-    numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df, 1, 2)
+    numericalDf, non_numericalRows, non_numericalColumns = getNumericalData(df, 1, nnnColumns)
 
     try:
 
@@ -35,21 +35,23 @@ def loadDataFrame(df, connection, lookupTables, source_id):
 
         ### Location_Dim handler
 
-        for country in non_numericalColumns['Country']:
-            if not country in lookupTables[0] :
+        for index, country in enumerate(non_numericalColumns['Country']):
+            city="Undefined"
+            if "City" in non_numericalColumns.columns: city = non_numericalColumns['City'].iloc[index]
+            if not (country,city) in lookupTables[0] :
                 insert_country = text('''
-                                    INSERT INTO "Location_Dim" (country) 
-                                    VALUES (:country)
+                                    INSERT INTO "Location_Dim" (country, city) 
+                                    VALUES (:country, :city)
                                     RETURNING location_id;
                                     ''')
-                new_insert = connection.execute(insert_country, {'country': country})
+                new_insert = connection.execute(insert_country, {'country': country, 'city': city})
                 location_id = new_insert.fetchone()[0]
-                lookupTables[0][country] = location_id
+                lookupTables[0][(country, city)] = location_id
         print("The 'Location_Dim' table correctly populated")
 
         ### Param_Dim handler
 
-        non_numericalRows = non_numericalRows.iloc[:,2:]
+        non_numericalRows = non_numericalRows.iloc[:,nnnColumns:]
         for column_name in non_numericalRows.columns:
             if not column_name in lookupTables[1] :
                 unit_of_measure = non_numericalRows.loc[0, column_name]
@@ -80,12 +82,14 @@ def loadDataFrame(df, connection, lookupTables, source_id):
                 print(f"Date of '{row['Date']}' not found in date_dim.")
                 #continue    # Skip this row if location_id is not found
 
-            location_id = lookupTables[0].get(row['Country'])
+            city="Undefined"
+            if "City" in non_numericalColumns.columns: city = row['City']
+            location_id = lookupTables[0][(row['Country'], city)]
             if location_id is None:
                 print(f"Location of '{row['Country']}' not found in location_dim.")
                 #continue    # Skip this row if location_id is not found
             
-            for column in df.columns[2:]:
+            for column in df.columns[nnnColumns:]:
                 param_id = lookupTables[1].get(column)
                 if param_id is None:
                     print(f"Parameter '{column}' not found in param_dim.")
