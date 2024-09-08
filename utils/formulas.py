@@ -31,3 +31,25 @@ def find_closest(lat, lon, df):
     
     # Return the row with the minimum difference
     return df.loc[min_diff_index]
+
+
+
+def get_description_from_cls(cls_value, location_data_1):
+
+    descriptions = {category: {} for category in location_data_1['Category'].unique()}
+    
+    for _, row in location_data_1.iterrows():
+        category = row['Category']
+        code = row['Code']
+        description = row['Description']
+        if code not in descriptions[category]:
+            descriptions[category][code] = description
+    
+    description_results = {}
+    for category, code_desc_map in descriptions.items():
+        for code in cls_value:
+            if code in code_desc_map:
+                description_results[category] = code_desc_map[code]
+                break
+    
+    return description_results

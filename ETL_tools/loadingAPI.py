@@ -1,7 +1,7 @@
 import datetime
 import numpy as np
 from sqlalchemy import text
-from utils.formulas import find_closest, round_to_nearest_quarter
+from utils.formulas import *
 from utils.pandasAPI import *
 
 def loadDataFrame(df, connection, lookupTables, nnnColumns, source_id):
@@ -191,7 +191,7 @@ def loadExtraData(connection, paramData, locationData):
         print("The 'Param_Dim' description column correctly populated \n")
 
         ### Location_Dim handler
-        print(locationData[0],locationData[1],locationData[2])
+
         for index, row in locationData[2].iterrows():
             latitude = pd.to_numeric(row['latitude'], errors='coerce')
             longitude = pd.to_numeric(row['longitude'], errors='coerce')
@@ -207,19 +207,24 @@ def loadExtraData(connection, paramData, locationData):
                 cls_value = closest_row['Cls']
                 #print(f"Lat {rounded_latitude}, Lon {rounded_longitude} is closest to Lat {closest_row['Lat']}, Lon {closest_row['Lon']} with Cls {cls_value}")
 
+                descriptions = get_description_from_cls(cls_value, locationData[1])
+
                 update_location = text("""
                     UPDATE "Location_Dim"
-                    SET latitude = :latitude, longitude = :longitude
+                    SET latitude = :latitude, longitude = :longitude, climate_zone = :climate_zone, precipitation_zone = :precipitation_zone, temperature_zone = :temperature_zone
                     WHERE country = :country;
                 """)
                 connection.execute(update_location, {
                     'country': country,
                     'latitude': rounded_latitude,
-                    'longitude': rounded_longitude
+                    'longitude': rounded_longitude,
+                    'climate_zone': descriptions.get('Main Climate'),
+                    'precipitation_zone': descriptions.get('Precipitation'),
+                    'temperature_zone': descriptions.get('Temperature'),
                 })
 
 
-        print("The 'Location_Dim' latitude and longitude correctly populated \n")
+        print("The 'Location_Dim' latitude, longitude and zones correctly populated \n")
 
 
     except Exception as e:

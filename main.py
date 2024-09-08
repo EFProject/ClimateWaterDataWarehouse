@@ -27,9 +27,9 @@ lookupTables.append(loadSourceData(dbConnection, sourceData))
 
 ### ETL ###
 
-#CID_dataset_ETL(climateDF[0], 0.8, dbConnection, lookupTables)
+CID_dataset_ETL(climateDF[0], 0.8, dbConnection, lookupTables)
 
-#GEI_dataset_ETL(climateDF[1].items(), 0.8, dbConnection, lookupTables)
+GEI_dataset_ETL(climateDF[1].items(), 0.8, dbConnection, lookupTables)
 
 loadExtraData(dbConnection, parameterData, locationData)
 print (f"### Extra Data correctly loaded into ClimateWaterDataWarehouse ###\n")

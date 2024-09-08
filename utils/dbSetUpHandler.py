@@ -29,6 +29,8 @@ def setUpDB(connection):
 									latitude VARCHAR(255),
 									longitude VARCHAR(255),
 						  			climate_zone VARCHAR(255),
+						  			precipitation_zone VARCHAR(255),
+						  			temperature_zone VARCHAR(255),
 						  			CONSTRAINT unique_location UNIQUE (country, city)
 								);
 								'''))
