@@ -48,3 +48,20 @@ def handleDuplicatesRemoval(df):
 	df.drop_duplicates(inplace=True) 		# Remove duplicate rows
 
 	return df
+
+
+def handleWaterMissingValuesRemoval(df, threshold, listColumns):
+
+	df.dropna(axis=0, how='all', inplace=True)						# Drop the rows where all elements are missing.
+	df.dropna(axis=1, how='all', inplace=True)						# Drop the columns where all elements are missing.
+
+	# Calculate the threshold for non-missing values
+	col_threshold = int(df.shape[0] * (1 - threshold))
+	row_threshold = int(df.shape[1] * (1 - threshold))
+
+	df.dropna(axis=0, thresh=row_threshold, inplace=True)			# Drop rows with threshold% or more missing values
+	df.dropna(axis=1, thresh=col_threshold, inplace=True)			# Drop columns with threshold% or more missing values
+
+	df.dropna(axis=0, subset=listColumns, inplace=True)			# Drop all rows where 'Country' or 'Date' has NaN values						
+
+	return df.reset_index(drop=True)

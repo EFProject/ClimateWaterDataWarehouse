@@ -89,6 +89,24 @@ def extractClimateExtraData():
 	return sourceData, parameterData, locationData
 
 
+def extractWaterData():
+
+	basePath = os.getcwd()
+	climatePath = basePath + '/datasets/WQ-Dataset/'
+
+	GGI_samples = read_csv_file(climatePath + 'Global_GemStat_Indicators\samples.csv', None, None, None, [0,1,4,5,7,8])
+	GGI_samples.rename(columns={0: 'Station Number', 1: 'Date', 4: 'Code Param', 5: 'Code Analysis', 7: 'Value', 8: 'Unit'}, inplace=True)
+	GGI_station = read_excel_file(climatePath + 'Global_GemStat_Indicators\metadata.xlsx', "Station_Metadata", 0, None, "A,D,E,F,G,N", 0, False, 0)
+	GGI_parameter = read_excel_file(climatePath + 'Global_GemStat_Indicators\metadata.xlsx', "Parameter_Metadata", 0, None, "A,B,D,H", 0, False, 0)
+	GGI_methods = read_excel_file(climatePath + 'Global_GemStat_Indicators\metadata.xlsx', "Methods_Metadata", 0, None, "B,E,F,I", 0, False, 0)
+
+	GGII = {
+		"SamplesData": GGI_samples, "StationData": GGI_station, "ParameterData": GGI_parameter, "MethodsData": GGI_methods
+	}
+
+	return GGII
+
+
 def extractEnvironmentalData():
 
 	basePath = os.getcwd()

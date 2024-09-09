@@ -135,3 +135,24 @@ def applyMappingFormat(df, dfName):
 
 
 	return df
+
+
+
+def applyWaterStandardizationFormat(df, name):
+
+	if name == "SamplesData" :
+		df['Station Number'] = df['Station Number'].map(standardize_string_format)
+		df['Date'] = df['Date'].map(standardize_datetime_format_CID)
+		df['Code Param'] = df['Code Param'].map(standardize_string_format)
+		df['Code Analysis'] = df['Code Analysis'].map(standardize_string_format)
+		df['Value'] = df['Value'].map(standardize_numerical_format)
+		df['Unit'] = df['Unit'].map(standardize_string_format)
+	if name == "StationData" :
+		df['GEMS Station Number'] = df['GEMS Station Number'].map(standardize_string_format)
+		df['Country Name'] = df['Country Name'].map(standardize_string_format)
+		df['Water Type'] = df['Water Type'].map(standardize_string_format)
+		df['Station Identifier'] = df['Station Identifier'].map(standardize_string_format)
+		df['Station Narrative'] = df['Station Narrative'].replace(["...", "", "…"], np.nan)
+		df['Responsible Collection Agency'] = df['Responsible Collection Agency'].map(standardize_string_format)
+
+	return df

@@ -84,3 +84,72 @@ def GEI_dataset_ETL(dfGEI, threshold, dbConnection, lookupTables):
 		source_id = lookupTables[3][dfName]
 		loadDataFrame(dfImputated, dbConnection, lookupTables, 2, source_id)
 		print (f"### {dfName} correctly loaded into ClimateWaterDataWarehouse ###\n")
+
+
+### GGI DATASET ###
+
+def GGI_dataset_ETL(dfGGI, threshold, dbConnection, lookupTables):	
+
+	print(f"\n######### ETL on GGI DATASET #########\n")
+
+	dfName = "SamplesData"
+	dfExtracted = dfGGI.get(dfName)
+		
+	#print(f"\nDataframe after extraction: {dfName}\n", dfExtracted)
+
+	### TRASFORMATION ###
+
+	dfStandardized = applyWaterStandardizationFormat(dfExtracted, dfName)
+	#print(f"\nDataframe after StandardizationFormat: {dfName}\n", dfStandardized)
+
+	### CLEANSING ###
+
+	dfCleaned = handleDuplicatesRemoval(dfStandardized)
+	#print(f"\n Dataframe after DuplicatesRemoval : {dfName}\n",dfCleaned)
+
+	dfCleaned = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['Station Number', 'Date','Code Param','Code Analysis','Value','Unit'])
+	print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
+
+	### EXPLORATION ###
+
+	#print(getDescriptionStatistics(dfImputated))
+
+	#getDataDistribution(dfImputated)
+
+	# getDataCorrelation(dfImputated)
+
+	### LOADING ###
+
+	#loadDataFrame(dfImputated, dbConnection, lookupTables, 2, source_id)
+	print (f"### {dfName} correctly loaded into ClimateWaterDataWarehouse ###\n")
+
+
+### GGI EXTRADATA DATASET ###
+
+def GGI_ExtraData_ETL(dfGGI, threshold, dbConnection, lookupTables):
+
+	print(f"\n######### ETL on GGI EXTRADATA DATASET #########\n")
+	
+	dfName = "StationData"
+	dfExtracted = dfGGI.get(dfName)
+		
+	#print(f"\nDataframe after extraction: {dfName}\n", dfExtracted)
+
+	### TRASFORMATION ###
+
+	dfStandardized = applyWaterStandardizationFormat(dfExtracted, dfName)
+	#print(f"\nDataframe after StandardizationFormat: {dfName}\n", dfStandardized)
+
+	### CLEANSING ###
+
+	dfCleaned = handleDuplicatesRemoval(dfStandardized)
+	#print(f"\n Dataframe after DuplicatesRemoval : {dfName}\n",dfCleaned)
+
+	dfCleaned = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['GEMS Station Number', 'Country Name'])
+	print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
+
+	### LOADING ###
+
+	loadWaterExtraData(dfCleaned, dbConnection, lookupTables)
+	
+	print (f"### {dfName} correctly loaded into ClimateWaterDataWarehouse ###\n")
