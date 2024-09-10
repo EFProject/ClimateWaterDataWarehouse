@@ -1,6 +1,7 @@
 from ETL_tools.transformationAPI import *
 from ETL_tools.cleansingAPI import *
-from ETL_tools.loadingAPI import *
+from ETL_tools.loadingClimateDataAPI import *
+from ETL_tools.loadingWaterDataAPI import *
 
 
 ### CID DATASET ###
@@ -126,13 +127,12 @@ def GGI_dataset_ETL(dfGGI, threshold, dbConnection, lookupTables):
 
 ### GGI EXTRADATA DATASET ###
 
-def GGI_ExtraData_ETL(dfGGI, threshold, dbConnection, lookupTables):
+def GGI_ExtraData_ETL(dfGGI, threshold, dbConnection, lookupTables, clsData):
 
 	print(f"\n######### ETL on GGI EXTRADATA DATASET #########\n")
 	
 	dfName = "StationData"
 	dfExtracted = dfGGI.get(dfName)
-		
 	#print(f"\nDataframe after extraction: {dfName}\n", dfExtracted)
 
 	### TRASFORMATION ###
@@ -145,11 +145,51 @@ def GGI_ExtraData_ETL(dfGGI, threshold, dbConnection, lookupTables):
 	dfCleaned = handleDuplicatesRemoval(dfStandardized)
 	#print(f"\n Dataframe after DuplicatesRemoval : {dfName}\n",dfCleaned)
 
-	dfCleaned = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['GEMS Station Number', 'Country Name'])
-	print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
+	stationData = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['GEMS Station Number', 'Country Name'])
+	#print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
+
+
+	dfName = "MethodsData"
+	dfExtracted = dfGGI.get(dfName)
+	#print(f"\nDataframe after extraction: {dfName}\n", dfExtracted)
+
+	### TRASFORMATION ###
+
+	dfStandardized = applyWaterStandardizationFormat(dfExtracted, dfName)
+	#print(f"\nDataframe after StandardizationFormat: {dfName}\n", dfStandardized)
+
+	### CLEANSING ###
+
+	dfCleaned = handleDuplicatesRemoval(dfStandardized)
+	#print(f"\n Dataframe after DuplicatesRemoval : {dfName}\n",dfCleaned)
+
+	methodData = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['Parameter Code', 'Unit'])
+	#print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
+	
+
+	dfName = "ParameterData"
+	dfExtracted = dfGGI.get(dfName)
+	#print(f"\nDataframe after extraction: {dfName}\n", dfExtracted)
+
+	### TRASFORMATION ###
+
+	dfStandardized = applyWaterStandardizationFormat(dfExtracted, dfName)
+	#print(f"\nDataframe after StandardizationFormat: {dfName}\n", dfStandardized)
+
+	### CLEANSING ###
+
+	dfCleaned = handleDuplicatesRemoval(dfStandardized)
+	#print(f"\n Dataframe after DuplicatesRemoval : {dfName}\n",dfCleaned)
+
+	paramData = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['Parameter Code', 'Parameter Name'])
+	#print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
 
 	### LOADING ###
 
-	loadWaterExtraData(dfCleaned, dbConnection, lookupTables)
+	loadWaterExtraData(stationData, paramData, methodData, dbConnection, lookupTables, clsData)
+
+	lookUpCodeTable = getLookUpCodeTable(stationData, paramData, lookupTables)
 	
-	print (f"### {dfName} correctly loaded into ClimateWaterDataWarehouse ###\n")
+	print (f"\n### GGI EXTRADATA correctly loaded into ClimateWaterDataWarehouse ###\n")
+
+	return lookUpCodeTable

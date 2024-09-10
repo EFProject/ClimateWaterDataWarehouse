@@ -154,5 +154,19 @@ def applyWaterStandardizationFormat(df, name):
 		df['Station Identifier'] = df['Station Identifier'].map(standardize_string_format)
 		df['Station Narrative'] = df['Station Narrative'].replace(["...", "", "…"], np.nan)
 		df['Responsible Collection Agency'] = df['Responsible Collection Agency'].map(standardize_string_format)
+	if name == "ParameterData" :
+		df['Parameter Code'] = df['Parameter Code'].map(standardize_string_format)
+		df['Parameter Name'] = df['Parameter Name'].map(standardize_string_format)
+		df['Parameter Group'] = df['Parameter Group'].map(standardize_string_format)
+		df['Parameter Description'] = df['Parameter Description'].map(standardize_string_format)
+		# Split 'Parameter Group' into 3 new columns
+		df[['Category', 'Sub_Category', 'Category_Detail']] = df['Parameter Group'].str.strip('/').str.split('/', expand=True)
+	if name == "MethodsData" :
+		df['Parameter Code'] = df['Parameter Code'].map(standardize_string_format)
+		df['Analysis Method Code'] = df['Analysis Method Code'].map(standardize_string_format)
+		df['Unit'] = df['Unit'].map(standardize_string_format)
+		df['Method Name'] = df['Method Name'].map(standardize_string_format)
+		df['Method Type'] = df['Method Type'].map(standardize_string_format)
+		df['Method Description'] = df['Method Description'].map(standardize_string_format)
 
 	return df

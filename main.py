@@ -6,7 +6,7 @@ from datasetOrchestrator import *
 from utils.explorationAPI import *
 from utils.dbConnectionHandler import connection_handler
 from utils.dbSetUpHandler import *
-from ETL_tools.loadingAPI import *
+from ETL_tools.loadingClimateDataAPI import *
 
 
 ### SETUP DB ###
@@ -32,9 +32,9 @@ lookupTables.append(loadSourceData(dbConnection, sourceData))
 
 #GEI_dataset_ETL(climateDF[1].items(), 0.8, dbConnection, lookupTables)
 
-GGI_ExtraData_ETL(waterDF, 0.8, dbConnection, lookupTables)
+lookUpCodeTable = GGI_ExtraData_ETL(waterDF, 0.8, dbConnection, lookupTables, locationData)
 
-#GGI_dataset_ETL(waterDF, 0.8, dbConnection, lookupTables)
+#GGI_dataset_ETL(waterDF, 0.8, dbConnection, lookUpCodeTable)
 
 
 loadExtraData(dbConnection, parameterData, locationData)
