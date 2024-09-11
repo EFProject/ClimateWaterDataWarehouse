@@ -89,7 +89,7 @@ def GEI_dataset_ETL(dfGEI, threshold, dbConnection, lookupTables):
 
 ### GGI DATASET ###
 
-def GGI_dataset_ETL(dfGGI, threshold, dbConnection, lookupTables):	
+def GGI_dataset_ETL(dfGGI, threshold, dbConnection, lookUpCodeTable):	
 
 	print(f"\n######### ETL on GGI DATASET #########\n")
 
@@ -108,7 +108,7 @@ def GGI_dataset_ETL(dfGGI, threshold, dbConnection, lookupTables):
 	dfCleaned = handleDuplicatesRemoval(dfStandardized)
 	#print(f"\n Dataframe after DuplicatesRemoval : {dfName}\n",dfCleaned)
 
-	dfCleaned = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['Station Number', 'Date','Code Param','Code Analysis','Value','Unit'])
+	dfCleaned = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['Station Number', 'Date','Code Param','Code Analysis','Value'])
 	print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
 
 	### EXPLORATION ###
@@ -121,7 +121,7 @@ def GGI_dataset_ETL(dfGGI, threshold, dbConnection, lookupTables):
 
 	### LOADING ###
 
-	#loadDataFrame(dfImputated, dbConnection, lookupTables, 2, source_id)
+	loadWaterDataFrame(dfCleaned, dbConnection, lookUpCodeTable)
 	print (f"### {dfName} correctly loaded into ClimateWaterDataWarehouse ###\n")
 
 

@@ -28,13 +28,13 @@ lookupTables.append(loadSourceData(dbConnection, sourceData))
 
 ### ETL ###
 
-#CID_dataset_ETL(climateDF[0], 0.8, dbConnection, lookupTables)
+CID_dataset_ETL(climateDF[0], 0.8, dbConnection, lookupTables)
 
-#GEI_dataset_ETL(climateDF[1].items(), 0.8, dbConnection, lookupTables)
+GEI_dataset_ETL(climateDF[1].items(), 0.8, dbConnection, lookupTables)
 
 lookUpCodeTable = GGI_ExtraData_ETL(waterDF, 0.8, dbConnection, lookupTables, locationData)
 
-#GGI_dataset_ETL(waterDF, 0.8, dbConnection, lookUpCodeTable)
+GGI_dataset_ETL(waterDF, 0.8, dbConnection, lookUpCodeTable)
 
 
 loadExtraData(dbConnection, parameterData, locationData)

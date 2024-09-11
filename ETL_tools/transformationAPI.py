@@ -146,7 +146,6 @@ def applyWaterStandardizationFormat(df, name):
 		df['Code Param'] = df['Code Param'].map(standardize_string_format)
 		df['Code Analysis'] = df['Code Analysis'].map(standardize_string_format)
 		df['Value'] = df['Value'].map(standardize_numerical_format)
-		df['Unit'] = df['Unit'].map(standardize_string_format)
 	if name == "StationData" :
 		df['GEMS Station Number'] = df['GEMS Station Number'].map(standardize_string_format)
 		df['Country Name'] = df['Country Name'].map(standardize_string_format)
