@@ -116,9 +116,6 @@ def loadDataFrame(df, connection, lookupTables, nnnColumns, source_id):
         result = connection.execute(text('SELECT COUNT(*) FROM "Environment_Fact";'))
         count = result.scalar()
         print(f"The 'Environment_Fact' table correctly populated : {count} rows \n ")
-        
-
-        #numericalDf.to_sql("Location_Dim", connection, schema='ClimateWaterDataWarehouse', if_exists='replace', index=False)
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -137,17 +134,19 @@ def loadSourceData(connection, sourceData):
             nameDF = source['nameDF']
             source_name = source['source_name']
             source_link = source['source_link']
+            source_type = source['source_type']
             source_data_quality = source['source_data_quality']
 
             insert_source = text('''
-                                INSERT INTO "Source_Dim" (source_name, source_link, source_data_quality) 
-                                VALUES (:source_name, :source_link, :source_data_quality)
+                                INSERT INTO "Source_Dim" (source_name, source_link, source_type, source_data_quality) 
+                                VALUES (:source_name, :source_link, :source_type, :source_data_quality)
                                 ON CONFLICT (source_name) DO NOTHING
                                 RETURNING source_id;
                                 ''')
             new_insert = connection.execute(insert_source, {
                     'source_name': source_name,
                     'source_link': source_link,
+                    'source_type': source_type,
                     'source_data_quality': source_data_quality
                 })
             
@@ -188,7 +187,7 @@ def loadExtraData(connection, paramData, locationData):
                 'param_name': param,
                 'description': paramData[param]
             })
-        print("The 'Param_Dim' description column correctly populated \n")
+        print("The 'Param_Dim' description column correctly populated")
 
         ### Location_Dim handler
 
@@ -223,8 +222,23 @@ def loadExtraData(connection, paramData, locationData):
                     'temperature_zone': descriptions.get('Temperature'),
                 })
 
+        print("The 'Location_Dim' latitude, longitude and zones correctly populated")
 
-        print("The 'Location_Dim' latitude, longitude and zones correctly populated \n")
+        for index, row in locationData[3].iterrows():
+            country = row['Country']
+            continent = row['Continent']
+
+            update_location = text("""
+                UPDATE "Location_Dim"
+                SET continent = :continent
+                WHERE country = :country;
+            """)
+            connection.execute(update_location, {
+                'country': country,
+                'continent': continent,
+            })
+
+        print("The 'Location_Dim' continent correctly populated")
 
 
     except Exception as e:

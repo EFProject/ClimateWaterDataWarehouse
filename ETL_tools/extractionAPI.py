@@ -51,27 +51,18 @@ def extractClimateExtraData():
 	GEI_AC_7 = read_excel_file(GEIPath + 'Air and Climate/ODS_Consumption.xlsx', 0, 192, None, "A", 0, False, 0)
 	GEI_AC_8 = read_excel_file(GEIPath + 'Air and Climate/SO2_emissions.xlsx', 0, 153, None, "A", 0, False, 0)
 
-	KGC_1 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/Koeppen-Geiger-ASCII.txt', "\s+", 0, None, None)
-
-	KGC_2 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/TableDefinitions.csv', ",", 0, None, None)
-
-	LAL = read_csv_file(climatePath + '1.4_Latitude_and_Longitude\world_country_and_usa_states_latitude_and_longitude_values.csv', ",", 0, None, ['latitude','longitude','country','usa_state_latitude','usa_state_longitude','usa_state'])
-	LAL.rename(columns={'usa_state_latitude': 'latitude', 'usa_state_longitude': 'longitude', 'usa_state': 'country'}, inplace=True)
-	LAL = pd.concat([LAL.iloc[:,:3], LAL.iloc[:,3:]], axis=0).reset_index(drop=True)
-	LAL.dropna(axis=0, how='all', inplace=True)
-
 	sourceData = [
-			{ "nameDF" : "CID", "source_name" : "Kaggle_Climate Insights Dataset", "source_link" : "https://www.kaggle.com/datasets/goyaladi/climate-insights-dataset", "source_data_quality" : "Not provided"},
+			{ "nameDF" : "CID", "source_name" : "Kaggle_Climate Insights Dataset", "source_link" : "https://www.kaggle.com/datasets/goyaladi/climate-insights-dataset", "source_type" : "Private", "source_data_quality" : "Not provided"},
 
-			{ "nameDF" : "CH4_N2O_Emissions", "source_name" : GEI_AC_2.loc[1, 'Sources:'], "source_link" : GEI_AC_2.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_2.loc[13, 'Sources:']},
-			{ "nameDF" : "CO2_Emissions", "source_name" : GEI_AC_2.loc[1, 'Sources:'], "source_link" : GEI_AC_2.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_2.loc[13, 'Sources:']},
-			{ "nameDF" : "GHG_by_Sector_Perc", "source_name" : GEI_AC_3.loc[1, 'Sources:'], "source_link" : GEI_AC_3.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_3.loc[16, 'Sources:']},
-			{ "nameDF" : "GHG_Emissions_by_Sector", "source_name" : GEI_AC_4.loc[1, 'Sources:'], "source_link" : GEI_AC_4.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_4.loc[16, 'Sources:']},
-			{ "nameDF" : "GHG_Emissions", "source_name" : GEI_AC_5.loc[1, 'Sources:'], "source_link" : GEI_AC_5.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_5.loc[24, 'Sources:']},
-			{ "nameDF" : "NOx_Emissions", "source_name" : GEI_AC_6.loc[1, 'Sources:'], "source_link" : GEI_AC_6.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_6.loc[28, 'Sources:']},
-			{ "nameDF" : "ODS_Consumption_2002", "source_name" : GEI_AC_7.loc[1, 'Sources:'], "source_link" : GEI_AC_7.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_7.loc[32, 'Sources:']},
-			{ "nameDF" : "ODS_Consumption_2013", "source_name" : GEI_AC_7.loc[1, 'Sources:'], "source_link" : GEI_AC_7.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_7.loc[32, 'Sources:']},
-			{ "nameDF" : "SO2_emissions", "source_name" : GEI_AC_8.loc[1, 'Sources:'], "source_link" : GEI_AC_8.loc[2, 'Sources:'], "source_data_quality" : GEI_AC_8.loc[25, 'Sources:']}
+			{ "nameDF" : "CH4_N2O_Emissions", "source_name" : GEI_AC_2.loc[1, 'Sources:'], "source_link" : GEI_AC_2.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_2.loc[13, 'Sources:']},
+			{ "nameDF" : "CO2_Emissions", "source_name" : GEI_AC_2.loc[1, 'Sources:'], "source_link" : GEI_AC_2.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_2.loc[13, 'Sources:']},
+			{ "nameDF" : "GHG_by_Sector_Perc", "source_name" : GEI_AC_3.loc[1, 'Sources:'], "source_link" : GEI_AC_3.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_3.loc[16, 'Sources:']},
+			{ "nameDF" : "GHG_Emissions_by_Sector", "source_name" : GEI_AC_4.loc[1, 'Sources:'], "source_link" : GEI_AC_4.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_4.loc[16, 'Sources:']},
+			{ "nameDF" : "GHG_Emissions", "source_name" : GEI_AC_5.loc[1, 'Sources:'], "source_link" : GEI_AC_5.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_5.loc[24, 'Sources:']},
+			{ "nameDF" : "NOx_Emissions", "source_name" : GEI_AC_6.loc[1, 'Sources:'], "source_link" : GEI_AC_6.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_6.loc[28, 'Sources:']},
+			{ "nameDF" : "ODS_Consumption_2002", "source_name" : GEI_AC_7.loc[1, 'Sources:'], "source_link" : GEI_AC_7.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_7.loc[32, 'Sources:']},
+			{ "nameDF" : "ODS_Consumption_2013", "source_name" : GEI_AC_7.loc[1, 'Sources:'], "source_link" : GEI_AC_7.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_7.loc[32, 'Sources:']},
+			{ "nameDF" : "SO2_emissions", "source_name" : GEI_AC_8.loc[1, 'Sources:'], "source_link" : GEI_AC_8.loc[2, 'Sources:'], "source_type" : "Governmental", "source_data_quality" : GEI_AC_8.loc[25, 'Sources:']}
 		]
 	
 	parameterData = {
@@ -84,9 +75,29 @@ def extractClimateExtraData():
 		"SO2 emissions" : GEI_AC_8.loc[15, 'Sources:'], 
 	}
 
-	locationData = [KGC_1,KGC_2,LAL]
+	return sourceData, parameterData
 
-	return sourceData, parameterData, locationData
+
+def extractExtraData():
+
+	basePath = os.getcwd()
+	climatePath = basePath + '/datasets/Climate-Dataset/'
+
+	KGC_1 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/Koeppen-Geiger-ASCII.txt', "\s+", 0, None, None)
+	KGC_2 = read_csv_file(climatePath + '1.3_Köppen_Geiger_Classification/TableDefinitions.csv', ",", 0, None, None)
+
+	extraDataPath = basePath + '/datasets/ExtraData-Dataset/'
+
+	LAL = read_csv_file(extraDataPath + '1.4_Latitude_and_Longitude\world_country_and_usa_states_latitude_and_longitude_values.csv', ",", 0, None, ['latitude','longitude','country','usa_state_latitude','usa_state_longitude','usa_state'])
+	LAL.rename(columns={'usa_state_latitude': 'latitude', 'usa_state_longitude': 'longitude', 'usa_state': 'country'}, inplace=True)
+	LAL = pd.concat([LAL.iloc[:,:3], LAL.iloc[:,3:]], axis=0).reset_index(drop=True)
+	LAL.dropna(axis=0, how='all', inplace=True)
+
+	CBC = read_csv_file(extraDataPath + '1.5_Countries_by_Continent\Countries_by_continents.csv', ",", 0, None, None)
+
+	locationData = [KGC_1,KGC_2,LAL,CBC]
+
+	return locationData
 
 
 def extractWaterData():

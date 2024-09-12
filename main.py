@@ -23,7 +23,8 @@ lookupTables = getLookupTable(dbConnection)
 climateDF = extractClimateData()
 waterDF = extractWaterData() 
 
-sourceData, parameterData, locationData = extractClimateExtraData()
+sourceData, parameterData = extractClimateExtraData()
+locationData = extractExtraData()
 lookupTables.append(loadSourceData(dbConnection, sourceData))
 
 ### ETL ###
@@ -38,4 +39,4 @@ GGI_dataset_ETL(waterDF, 0.8, dbConnection, lookUpCodeTable)
 
 
 loadExtraData(dbConnection, parameterData, locationData)
-print (f"### Extra Data correctly loaded into ClimateWaterDataWarehouse ###\n")
+print (f"\n ### Extra Data correctly loaded into ClimateWaterDataWarehouse ###\n")

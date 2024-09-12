@@ -109,7 +109,7 @@ def GGI_dataset_ETL(dfGGI, threshold, dbConnection, lookUpCodeTable):
 	#print(f"\n Dataframe after DuplicatesRemoval : {dfName}\n",dfCleaned)
 
 	dfCleaned = handleWaterMissingValuesRemoval(dfCleaned, threshold, ['Station Number', 'Date','Code Param','Code Analysis','Value'])
-	print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
+	#print(f"\n Dataframe after MissingValuesRemoval : {dfName}\n",dfCleaned)
 
 	### EXPLORATION ###
 

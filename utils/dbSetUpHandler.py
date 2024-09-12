@@ -26,6 +26,7 @@ def setUpDB(connection):
 									location_id SERIAL PRIMARY KEY,
 									country VARCHAR(255) NOT NULL,
 									city VARCHAR(255),
+						  			continent VARCHAR(255),
 									latitude VARCHAR(255),
 									longitude VARCHAR(255),
 						  			climate_zone VARCHAR(255),
